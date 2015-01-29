@@ -477,7 +477,7 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
         "gl_scale":gl_scale,   /*Canvas内のLive2Dモデルのスケール*/
         "paraent_id":paraent_id
     };
-    
+
     TYRANO.kag.stat.f.live2d_models[model_id] = live2d_model;
     Live2Dcanvas[model_id] = new Live2Dtyrano(ele.id, model_def, gl_left, gl_top, gl_scale);
     Live2Dcanvas[model_id].alphaChange(can_opacity);
@@ -523,9 +523,9 @@ function live2d_delete(model_id     /*Live2DモデルID*/,
     Live2Dcanvas[model_id].alphaChange(0.0);
     // キャンバスを削除する
     setTimeout("live2d_Canvas_delete('" + model_id + "','" + paraent_id + "');",3000);
-    
+
      delete TYRANO.kag.stat.f.live2d_models[model_id];
-    
+
 }
 
 /**
@@ -533,8 +533,6 @@ function live2d_delete(model_id     /*Live2DモデルID*/,
 */
 function live2d_Canvas_delete(model_id      /*Live2Dモデル名*/,
                               paraent_id    /*親ID*/){
-    var canvas_id = document.getElementById(Live2Dcanvas[model_id].canvas.id);
-    document.getElementById(paraent_id).removeChild(canvas_id);
     $("#Live2D_"+model_id).remove();
     Live2Dcanvas[model_id] = null;
 }
