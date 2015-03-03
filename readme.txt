@@ -49,8 +49,7 @@ data/others/live2d/lib配下にlibe2d.min.jsを置いて下さい。
 	モデルを差し替える場合
 ------------------------------
 others/live2d/assets配下を差し替えし、
-others/live2d/Live2Dmodel.jsをエディタで開きファイルのパスを修正して下さい。
-motionsの下にsoundの記載があるとモーション再生時に音声も一緒に流れます。
+others/live2d/Live2Dmodel.jsをエディタで開きファイルのパスとmodel.json名を修正して下さい。
 
 LIVE2D_MODEL['キャラ名']で指定した'キャラ名'がタグリファレンスに指定してる"キャラ名"になります。
 
