@@ -4,6 +4,8 @@
 ; ライブラリ読込
 [loadjs storage = "live2d/lib/live2d.min.js"]
 [loadjs storage = "live2d/framework/Live2DFramework.js"]
+[loadjs storage = "live2d/framework/PlatformManager.js"]
+[loadjs storage = "live2d/framework/LAppLive2DManager.js"]
 [loadjs storage = "live2d/Live2Dmodel.js"]
 [loadjs storage = "live2d/Live2Dtyrano.js"]
 
@@ -137,14 +139,16 @@ live2d_delete(mp.name, parentID);
 ;------------------------------------------------------------
 [macro name = "live2d_motion"]
 ;*パラメータ1  : name         【必須】Live2DモデルID(一意なもの)
-;*パラメータ2  : filenm              Live2Dモーション番号
+;*パラメータ2  : filenm              Live2Dモーションファイル名
+; パラメータ3  : idle                アイドリング有無
 [iscript]
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
 ;モーション番号を指定しない場合、モーションストップ
 if(mp.filenm == null)mp.filenm = '';
+if(mp.idle == null)mp.idle = '';
 ; Live2Dモデルのモーション再生[Live2Dtyrano.js]
-Live2Dcanvas[mp.name].motionChange(mp.filenm);
+Live2Dcanvas[mp.name].motionChange(mp.filenm, mp.idle);
 [endscript]
 [endmacro]
 

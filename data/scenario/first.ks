@@ -67,10 +67,11 @@ Live2Dを使う事で今までにないアニメーションを[r]する事が�
 
 
 さらにモーションや音声の再生もできるよ[p]
-[live2d_motion name="haru" filenm="8"]
+[live2d_motion name="haru" filenm="tapBody_00.mtn"]
 [wait time=3500]
-[live2d_motion name="haru" filenm="17"]
+[live2d_motion name="haru" filenm="tapBody_02.mtn"]
 [wait time=3000]
+[live2d_motion name="haru" filenm="idle_00.mtn" idle="ON"]
 
 友達を紹介するね。イプシロンちゃーんっ！[p]
 [live2d_trans name="haru" left=-200 top=0]
@@ -80,10 +81,12 @@ Live2Dを使う事で今までにないアニメーションを[r]する事が�
 [live2d_trans name="Epsilon" left=100 top=-70]
 はいはーい[p]
 [wait time=1000]
+; アイドルモーションの指定
+[live2d_motion name="Epsilon" filenm="Epsilon_free_idle_01.mtn" idle="ON"]
 
 ねっ、これでLiv2Dを使ったゲームも作れるね！[p]
-[live2d_motion name="haru" filenm="3"]
-[live2d_motion name="Epsilon" filenm="4"]
+[live2d_motion name="haru" filenm="idle_02.mtn"]
+[live2d_motion name="Epsilon" filenm="Epsilon_free_m_sp_01.mtn"]
 じゃあ、ゲーム開発を頑張ってね。[r]ばいばーい[p]
 [live2d_delete name="haru"]
 [live2d_delete name="Epsilon"]
