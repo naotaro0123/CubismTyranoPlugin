@@ -31,6 +31,10 @@ data/others/live2d/lib配下にlibe2d.min.jsを置いて下さい。
 ------------------------------
 	リリースノート
 ------------------------------
+	1.0.03(2015/03/03)
+		pose.json、physics.json、model.jsonを読み込む方式に変更
+		モーション再生はファイル名指定、アイドリング有無パラメーター追加
+
 	1.0.02(2015/02/10)
 		IEとMobile safariにて透明部分が黒くなるものをテクスチャゴミ取りツールで修正
 		
@@ -109,7 +113,8 @@ https://sites.google.com/a/cybernoids.jp/cubism2/tools/texture
  [live2d_motion name="キャラ名"]
 　【パラメータ一覧】
 　　name     : 【必須】Live2DモデルID(Live2Dmodel.jsで付けた名前)
-　　filenm   : モーション番号(Live2Dmodel.jsのmotions配下。上から0,1,2...)
+　　filenm   : モーション番号(モーションファイル名)
+　　idle     : アイドリング有無('ON'など文字列を渡すとアイドリングさせます)
 
 ・Live2Dモデルの移動
  [live2d_trans name="キャラ名"]
@@ -197,52 +202,66 @@ live2dplugin
     │          │  │          Epsilon_free_shake_01.mtn
     │          │  │
     │          │  └─haru
-    │          │      │  haru.moc
+    │          │      │  haru.model.json
+    │          │      │  haru.physics.json
+    │          │      │  haru.pose.json
+    │          │      │  haru_01.moc
+    │          │      │  haru_01.model.json
+    │          │      │  haru_02.moc
+    │          │      │  haru_02.model.json
     │          │      │
-    │          │      ├─haru.1024
+    │          │      ├─expressions
+    │          │      │      f01.exp.json
+    │          │      │      f02.exp.json
+    │          │      │      f03.exp.json
+    │          │      │      f04.exp.json
+    │          │      │      f05.exp.json
+    │          │      │      f06.exp.json
+    │          │      │      f07.exp.json
+    │          │      │      f08.exp.json
+    │          │      │
+    │          │      ├─haru_01.1024
+    │          │      │      texture_00.png
+    │          │      │      texture_01.png
+    │          │      │      texture_02.png
+    │          │      │
+    │          │      ├─haru_02.1024
     │          │      │      texture_00.png
     │          │      │      texture_01.png
     │          │      │      texture_02.png
     │          │      │
     │          │      ├─motions
-    │          │      │      haru_idle_01.mtn
-    │          │      │      haru_idle_02.mtn
-    │          │      │      haru_idle_03.mtn
-    │          │      │      haru_m_01.mtn
-    │          │      │      haru_m_02.mtn
-    │          │      │      haru_m_03.mtn
-    │          │      │      haru_m_04.mtn
-    │          │      │      haru_m_05.mtn
-    │          │      │      haru_m_06.mtn
-    │          │      │      haru_m_07.mtn
-    │          │      │      haru_m_08.mtn
-    │          │      │      haru_m_09.mtn
-    │          │      │      haru_m_10.mtn
-    │          │      │      haru_normal_01.mtn
-    │          │      │      haru_normal_02.mtn
-    │          │      │      haru_normal_03.mtn
-    │          │      │      haru_normal_04.mtn
-    │          │      │      haru_normal_05.mtn
-    │          │      │      haru_normal_06.mtn
-    │          │      │      haru_normal_07.mtn
-    │          │      │      haru_normal_08.mtn
-    │          │      │      haru_normal_09.mtn
-    │          │      │      haru_normal_10.mtn
+    │          │      │      flickHead_00.mtn
+    │          │      │      idle_00.mtn
+    │          │      │      idle_01.mtn
+    │          │      │      idle_02.mtn
+    │          │      │      pinchIn_00.mtn
+    │          │      │      pinchOut_00.mtn
+    │          │      │      shake_00.mtn
+    │          │      │      tapBody_00.mtn
+    │          │      │      tapBody_01.mtn
+    │          │      │      tapBody_02.mtn
+    │          │      │      tapBody_03.mtn
+    │          │      │      tapBody_04.mtn
+    │          │      │      tapBody_05.mtn
+    │          │      │      tapBody_06.mtn
+    │          │      │      tapBody_07.mtn
+    │          │      │      tapBody_08.mtn
+    │          │      │      tapBody_09.mtn
     │          │      │
     │          │      └─sounds
-    │          │              haru_normal_01.mp3
-    │          │              haru_normal_02.mp3
-    │          │              haru_normal_03.mp3
-    │          │              haru_normal_04.mp3
-    │          │              haru_normal_05.mp3
-    │          │              haru_normal_06.mp3
-    │          │              haru_normal_07.mp3
-    │          │              haru_normal_08.mp3
-    │          │              haru_normal_09.mp3
-    │          │              haru_normal_10.mp3
+    │          │              flickHead_00.mp3
+    │          │              pinchIn_00.mp3
+    │          │              pinchOut_00.mp3
+    │          │              shake_00.mp3
+    │          │              tapBody_00.mp3
+    │          │              tapBody_01.mp3
+    │          │              tapBody_02.mp3
     │          │
     │          ├─framework
     │          │      Live2DFramework.js    Live2Dのモーション再生機能を提供するjs
+    │          │      LAppLive2DManager.js  モデルの生成やチェンジを行うjs
+    │          │      PlatformManager.js    モデルやテクスチャロードを行うjs
     │          │
     │          └─lib
     │                  live2d.min.js    Live2Dのライブラリ(※　Live2DサイトからＤＬしてくる)
