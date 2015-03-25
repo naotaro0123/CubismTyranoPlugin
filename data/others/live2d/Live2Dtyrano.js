@@ -9,11 +9,11 @@ var Live2Dcanvas = [];      // canvas
     * Live2Dのtyrano対応クラス
     ****************************************/
     var Live2Dtyrano = function( canvasid   /*canvasid*/,
-                                 filepath   /*ファイルパス*/,
-                                 modelpath  /*Live2Dモデルパス定義*/,
-                                 pointX     /*Live2Dモデルの表示位置X*/,
-                                 pointY     /*Live2Dモデルの表示位置Y*/,
-                                 modelscale /*Live2Dモデルの表示サイズ*/
+                                  filepath   /*ファイルパス*/,
+                                  modelpath  /*Live2Dモデルパス定義*/,
+                                  pointX     /*Live2Dモデルの表示位置X*/,
+                                  pointY     /*Live2Dモデルの表示位置Y*/,
+                                  modelscale /*Live2Dモデルの表示サイズ*/
                                  ) {
         // optional
         if(pointX == null)pointX = 0.0;
@@ -138,55 +138,15 @@ var Live2Dcanvas = [];      // canvas
             })( i );
         }
 
-        var motion_keys = [];   // モーションキー配列
-        var mtn_tag = 0;        // モーションタグ
-        var mtn_num = 0;        // モーションカウント
-        // keyを取得
-        for(var key in that.modelDef.motions){
-            // motions配下のキーを取得
-            motion_keys[mtn_tag] = key;
-            // 読み込むモーションファイル数を取得
-            mtn_num += that.modelDef.motions[motion_keys[mtn_tag]].length;
-            mtn_tag++;
-        }
-        // モーションタグ分ループ
-        for(var mtnkey in motion_keys){
-            // モーションとサウンドを読み込む(motions配下のタグを読み込む)
-            for(var j = 0; j < that.modelDef.motions[motion_keys[mtnkey]].length; j++){
-                // モーションファイル名を格納
-                var mtnfilenm = that.modelDef.motions[motion_keys[mtnkey]][j].file.split("/");
-                that.motionfilesnm.push(mtnfilenm[1]);
-                // モーションの数だけロード
-                that.loadBytes(that.filepath + that.modelDef.motions[motion_keys[mtnkey]][j].file, function(buf){
-                    that.motions.push(Live2DMotion.loadMotion(buf));
-                });
-                // サウンドの数だけロード
-                if(that.modelDef.motions[motion_keys[mtnkey]][j].sound == null){
-                    that.sounds.push("");
-                }else{
-                    that.sounds.push(new Sound(that.filepath + that.modelDef.motions[motion_keys[mtnkey]][j].sound));
-                }
-                // フェードイン
-                if(that.modelDef.motions[motion_keys[mtnkey]][j].fade_in == null){
-                    that.fadeines.push("");
-                }else{
-                    that.fadeines.push(that.modelDef.motions[motion_keys[mtnkey]][j].fade_in);
-                }
-                // フェードアウト
-                if(that.modelDef.motions[motion_keys[mtnkey]][j].fade_out == null){
-                    that.fadeoutes.push("");
-                }else{
-                    that.fadeoutes.push(that.modelDef.motions[motion_keys[mtnkey]][j].fade_out);
-                }
-            }
-        }
+        // モーションプリロード処理
+        that.preloadMotions(that);
 
         // モーションマネージャクラスの生成
         that.motionMgr = new L2DMotionManager();
 
         // ポーズのロード(json内にposeがあるかチェック)
         if(that.modelDef.pose !== void 0){
-                that.loadBytes(that.filepath + that.modelDef.pose, function(buf){
+            that.loadBytes(that.filepath + that.modelDef.pose, function(buf){
                 // ポースクラスのロード
                 that.pose = L2DPose.load(buf);
             });
@@ -194,7 +154,7 @@ var Live2Dcanvas = [];      // canvas
 
         // 物理演算のロード(json内にphysicsがあるかチェック)
         if(that.modelDef.physics !== void 0){
-                that.loadBytes(that.filepath + that.modelDef.physics, function(buf){
+            that.loadBytes(that.filepath + that.modelDef.physics, function(buf){
                 // 物理演算クラスのロード
                 that.physics = L2DPhysics.load(buf);
             });
@@ -216,10 +176,73 @@ var Live2Dcanvas = [];      // canvas
 
 
     /**
+    * モーションのプリロード
+    */
+    Live2Dtyrano.prototype.preloadMotions = function(that/*this代入した変数*/){
+        var motion_keys = [];   // モーションキー配列
+        var mtn_tag = 0;        // モーションタグ
+        var mtn_num = 0;        // モーションカウント
+
+        // keyを取得
+        for(var key in that.modelDef.motions){
+            // moitons配下のキーを取得
+            motion_keys[mtn_tag] = key;
+            // 読み込むモーションファイル数を取得
+            mtn_num += that.modelDef.motions[motion_keys[mtn_tag]].length;
+            mtn_tag++;
+        }
+
+        var mtncnt = 0;
+        // モーションタグ分ループ
+        for(var mtnkey in motion_keys){
+            // モーションとサウンドを読み込む(motions配下のタグを読み込む)
+            for(var j = 0; j < that.modelDef.motions[motion_keys[mtnkey]].length; j++){
+                // モーションファイル名を格納
+                var mtnfilenm = that.modelDef.motions[motion_keys[mtnkey]][j].file.split('/');
+                that.motionfilesnm[mtncnt] = mtnfilenm[1];
+
+                // 尺が長いモーションだけプリロードする
+                if(motion_keys [mtnkey] == PRELOAD_GROUP){
+                    (function(){
+                        var idlecnt = mtncnt;   // コールバック内で渡す変数
+                        // モーションの数だけロード
+                        that.loadBytes(that.filepath + that.modelDef.motions[motion_keys[mtnkey]][j].file, function(buf){
+                            that.motions[idlecnt] = Live2DMotion.loadMotion(buf);
+                        });
+                    })();
+                }else{
+                    // 尺が短いモーションはファイルパス文字列をセットする
+                    that.motions[mtncnt] = that.filepath + that.modelDef.motions[motion_keys[mtnkey]][j].file;
+                }
+                // サウンドの数だけロード
+                if(that.modelDef.motions[motion_keys[mtnkey]][j].sound == null){
+                    that.sounds[mtncnt] = "";
+                }else{
+                    that.sounds[mtncnt] = new Sound(that.filepath + that.modelDef.motions[motion_keys[mtnkey]][j].sound);
+                }
+                // フェードインのロード
+                if(that.modelDef.motions[motion_keys[mtnkey]][j].fade_in == null){
+                    that.fadeines[mtncnt] = "";
+                }else{
+                    that.fadeines[mtncnt] = that.modelDef.motions[motion_keys[mtnkey]][j].fade_in;
+                }
+                // フェードアウトのロード
+                if(that.modelDef.motions[motion_keys[mtnkey]][j].fade_out == null){
+                    that.fadeoutes[mtncnt] = "";
+                }else{
+                    that.fadeoutes[mtncnt] = that.modelDef.motions[motion_keys[mtnkey]][j].fade_out;
+                }
+                mtncnt++;
+            }
+        }
+    };
+
+
+    /**
     * Live2Dの描画処理
     */
     Live2Dtyrano.prototype.draw = function( gl  /*WebGLコンテキスト*/,
-                                            that/*this代入した変数*/){
+                                             that/*this代入した変数*/){
         // Canvasをクリアする
         gl.clear(gl.COLOR_BUFFER_BIT);
         // Live2D初期化
@@ -252,51 +275,24 @@ var Live2Dcanvas = [];      // canvas
             that.live2DModel.setMatrix(matrix4x4);
         }
 
-        // モーション再生された場合
-        if(that.motionflg == true && that.motionMgr.getCurrentPriority() == 0){
-            // フェードインの設定
-            that.motions[that.motionnm].setFadeIn(that.fadeines[that.motionnm]);
-            // フェードアウトの設定
-            that.motions[that.motionnm].setFadeOut(that.fadeines[that.motionnm]);
-            // アイドルモーションより優先度を上げたものを再生する
-            that.motionMgr.startMotion(that.motions[that.motionnm],1);
+        // アイドルモーション以外の場合（フラグで判定する）
+        if(that.motionflg == true){
+            console.log("モーション");
+            // 優先度高めでモーション再生
+            that.setMotion(that, that.motionnm, 1);
+            // フラグは落としておく
             that.motionflg = false;
-            // 音声ファイルが日もづくいていれば再生する
-            if(that.sounds[that.motionnm]){
-                // 前回のサウンドがあれば停止する
-                if(that.sounds[that.beforesound] != ""){
-                    that.sounds[that.beforesound].stop();
-                }
-                // サウンドを鳴らす
-                that.sounds[that.motionnm].play();
-                // 途中で停止するように格納しておく
-                that.beforesound = that.motionnm;
-            }
         }
 
-        // モーションが終了していたら1つ目のファイルアイドル再生
+        // モーションが終了していたらアイドルモーションの再生
         if(that.motionMgr.isFinished() && that.idlemotion != null){
-            // フェードインの設定
-            that.motions[that.idlemotion].setFadeIn(that.fadeines[that.idlemotion]);
-            // フェードアウトの設定
-            that.motions[that.idlemotion].setFadeOut(that.fadeoutes[that.idlemotion]);
-            // 優先度は低めでモーション再生
-            that.motionMgr.startMotion(that.motions[that.idlemotion], 0);
-            // 音声ファイルもあれば再生
-            if(that.sounds[that.idlemotion]){
-                // 前回の音声があれば停止する
-                if(that.sounds[that.beforesound] != ""){
-                    that.sounds[that.beforesound].stop();
-                }
-                // 音声を再生
-                that.sounds[that.idlemotion].play();
-                // 途中で停止できるように格納する
-                that.beforesound = that.idlemotion;
-            }
+            console.log("アイドル");
+            // 優先度低めでアイドルモーション再生
+            that.setMotion(that, that.idlemotion, 0);
         }
         // モーション指定されてない場合は動かない
         if(that.idlemotion != null || that.motionnm != null){
-            // モーションの更新
+            // モーションパラメータの更新
             that.motionMgr.updateParam(that.live2DModel);
         }
 
@@ -309,6 +305,68 @@ var Live2Dcanvas = [];      // canvas
         // Live2Dモデルを更新して描画
         that.live2DModel.update(); // 現在のパラメータに合わせて頂点等を計算
         that.live2DModel.draw();    // 描画
+    };
+
+
+    /**
+    * Live2Dのモーション再生
+    */
+    Live2Dtyrano.prototype.setMotion = function( that       /*this代入した変数*/,
+                                                  motioncnt  /*モーションIndex*/,
+                                                  priority   /*優先度*/){
+        // モーションの定義があった場合
+        if(that.motions[motioncnt] !== void 0){
+            // ファイルパスならバイト配列でロードする
+            if(typeof that.motions[motioncnt] == "string"){
+                // コールバックでモーションロード
+                that.loadBytes(that.motions[motioncnt], function(buf){
+                    that.motions[motioncnt] = Live2DMotion.loadMotion(buf);
+                    // フェードインの設定
+                    if(that.fadeines[motioncnt] != ""){
+                        that.motions[motioncnt].setFadeIn(that.fadeines[motioncnt]);
+                    }
+                    // フェードアウトの設定
+                    if(that.fadeoutes[motioncnt] != ""){
+                        that.motions[motioncnt].setFadeOut(that.fadeoutes[motioncnt]);
+                    }
+                    // 優先度を指定しモーション再生
+                    that.motionMgr.startMotion(that.motions[motioncnt], priority);
+                    // 音声ファイルもあれば再生
+                    if(that.sounds[motioncnt]){
+                        // 前回の音声があれば停止する
+                        if(that.sounds[that.beforesound] != ""){
+                            that.sounds[that.beforesound].stop();
+                        }
+                        // 音声を再生
+                        that.sounds[motioncnt].play();
+                        // 途中で停止できるように格納する
+                        that.beforesound = motioncnt;
+                    }
+                });
+            }else{
+                // フェードインの設定
+                if(that.fadeines[motioncnt] != ""){
+                    that.motions[motioncnt].setFadeIn(that.fadeines[motioncnt]);
+                }
+                // フェードアウトの設定
+                if(that.fadeoutes[motioncnt] != ""){
+                    that.motions[motioncnt].setFadeOut(that.fadeoutes[motioncnt]);
+                }
+                // 優先度を指定しモーション再生
+                that.motionMgr.startMotion(that.motions[motioncnt], priority);
+                // 音声ファイルもあれば再生
+                if(that.sounds[motioncnt]){
+                    // 前回の音声があれば停止する
+                    if(that.sounds[that.beforesound] != ""){
+                        that.sounds[that.beforesound].stop();
+                    }
+                    // 音声を再生
+                    that.sounds[motioncnt].play();
+                    // 途中で停止できるように格納する
+                    that.beforesound = motioncnt;
+                }
+            }
+        }
     };
 
 
@@ -336,7 +394,7 @@ var Live2Dcanvas = [];      // canvas
     * Image型オブジェクトからテクスチャを生成
     */
     Live2Dtyrano.prototype.createTexture = function( gl     /*WebGLコンテキスト*/,
-                                                     image  /*WebGL Image*/){
+                                                      image  /*WebGL Image*/){
         var texture = gl.createTexture(); //テクスチャオブジェクトを作成する
         if ( !texture ){
             console.log("Failed to generate gl texture name.");
@@ -373,12 +431,12 @@ var Live2Dcanvas = [];      // canvas
         request.responseType = "arraybuffer";
         request.onload = function(){
             switch( request.status ){
-            case 200:
-                callback( request.response );
-                break;
-            default:
-                console.log( "Failed to load (" + request.status + ") : " + path );
-                break;
+                case 200:
+                    callback( request.response );
+                    break;
+                default:
+                    console.log( "Failed to load (" + request.status + ") : " + path );
+                    break;
             }
         }
         request.send(null);
@@ -390,7 +448,7 @@ var Live2Dcanvas = [];      // canvas
     * モーション切り替え
     */
     Live2Dtyrano.prototype.motionChange = function(mtnfilenm/*モーションファイル名*/,
-                                                   idle/*アイドリング有無*/){
+                                                    idle/*アイドリング有無*/){
         var cnt = 0;
         // ファイル名からファイル番号を取り出す
         for(var k = 0; k < this.motionfilesnm.length; k++){
@@ -399,7 +457,6 @@ var Live2Dcanvas = [];      // canvas
             }
             cnt++;
         }
-
         // ファイル番号をセット
         this.motionnm = cnt;
         // アイドルフラグがONなら、指定したモーションをアイドリングさせる
@@ -414,8 +471,8 @@ var Live2Dcanvas = [];      // canvas
     * キャラクターの移動
     */
     Live2Dtyrano.prototype.transChange = function( left     /*CanvasのX位置*/,
-                                                   top      /*CanvasのY位置*/,
-                                                   time     /*アニメーション時間*/){
+                                                    top      /*CanvasのY位置*/,
+                                                    time     /*アニメーション時間*/){
         // optional
         if(left == null) left = 0;
         if(top == null) top = 0;
@@ -432,7 +489,7 @@ var Live2Dcanvas = [];      // canvas
     * キャラクターの回転
     */
     Live2Dtyrano.prototype.rotateChange= function( deg  /*Canvasの回転角度*/,
-                                                   time /*アニメーション時間*/){
+                                                    time /*アニメーション時間*/){
         // optional
         if(deg == null){
             this.degs = 0;
@@ -451,8 +508,8 @@ var Live2Dcanvas = [];      // canvas
     * キャラクターの拡大・縮小
     */
     Live2Dtyrano.prototype.scaleChange = function( scaleX   /*CanvasのXスケール*/,
-                                                   scaleY   /*CanvasのYスケール*/,
-                                                   time     /*アニメーション時間*/){
+                                                    scaleY   /*CanvasのYスケール*/,
+                                                    time     /*アニメーション時間*/){
         // optional
         if(scaleX == null) scaleX = 0;
         if(scaleY == null) scaleY = 0;
@@ -494,7 +551,7 @@ var Live2Dcanvas = [];      // canvas
     * キャラクターの透明度
     */
     Live2Dtyrano.prototype.alphaChange = function( opacity  /*Canvasの透明度*/,
-                                                   time     /*アニメーション時間*/){
+                                                    time     /*アニメーション時間*/){
         // optional
         if(opacity == null) opacity = 1.0;
         if(time == null) time = "1.0s";
@@ -542,17 +599,17 @@ var Live2Dcanvas = [];      // canvas
 * ファイルロードとLive2Dモデル生成
 */
 function live2d_new( model_def      /*Live2Dモデル定義*/,
-                     model_id       /*Live2DモデルID*/,
-                     can_left       /*CanvasのX位置*/,
-                     can_top        /*CanvasのY位置*/,
-                     can_width      /*Canvasの横幅*/,
-                     can_height     /*Canvasの高さ*/,
-                     can_zindex     /*Canvasの奥行き*/,
-                     can_opacity    /*Canvasの透明度*/,
-                     gl_left        /*Canvas内のLive2DモデルのX位置*/,
-                     gl_top         /*Canvas内のLive2DモデルのY位置*/,
-                     gl_scale       /*Canvas内のLive2Dモデルのスケール*/,
-                     paraent_id     /*親ID*/){
+                      model_id       /*Live2DモデルID*/,
+                      can_left       /*CanvasのX位置*/,
+                      can_top        /*CanvasのY位置*/,
+                      can_width      /*Canvasの横幅*/,
+                      can_height     /*Canvasの高さ*/,
+                      can_zindex     /*Canvasの奥行き*/,
+                      can_opacity    /*Canvasの透明度*/,
+                      gl_left        /*Canvas内のLive2DモデルのX位置*/,
+                      gl_top         /*Canvas内のLive2DモデルのY位置*/,
+                      gl_scale       /*Canvas内のLive2Dモデルのスケール*/,
+                      paraent_id     /*親ID*/){
 
     // optional
     if(can_left == null)can_left = 100;
@@ -618,14 +675,14 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
 * Live2Dモデルの生成
 */
 function _live2d_create( model_id      /*Live2DモデルID*/,
-                         live2d_model  /*Live2Dモデル情報*/,
-                         eleid         /*canvasid*/,
-                         filepath      /*ファイルパス*/,
-                         jsondata      /*Live2Dモデル定義*/,
-                         gl_left       /*Canvas内のLive2DモデルのX位置*/,
-                         gl_top        /*Canvas内のLive2DモデルのY位置*/,
-                         gl_scale      /*Canvas内のLive2Dモデルのスケール*/,
-                         can_opacity   /*Canvasの透明度*/
+                          live2d_model  /*Live2Dモデル情報*/,
+                          eleid         /*canvasid*/,
+                          filepath      /*ファイルパス*/,
+                          jsondata      /*Live2Dモデル定義*/,
+                          gl_left       /*Canvas内のLive2DモデルのX位置*/,
+                          gl_top        /*Canvas内のLive2DモデルのY位置*/,
+                          gl_scale      /*Canvas内のLive2Dモデルのスケール*/,
+                          can_opacity   /*Canvasの透明度*/
                          ){
 
     TYRANO.kag.stat.f.live2d_models[model_id] = live2d_model;
@@ -638,7 +695,7 @@ function _live2d_create( model_id      /*Live2DモデルID*/,
 * Live2Dキャラの表示
 */
 function live2d_show( model_id   /*Live2DモデルID*/,
-                      time       /*切り替え時間*/){
+                       time       /*切り替え時間*/){
     // キャラを透明からゆっくり表示する
     setTimeout("Live2Dcanvas['" + model_id + "'].alphaChange(1.0);", time);
     TYRANO.kag.stat.f.live2d_models[model_id]["can_opacity"] = 1;
@@ -648,7 +705,7 @@ function live2d_show( model_id   /*Live2DモデルID*/,
 * Live2Dキャラの非表示
 */
 function live2d_hide( model_id   /*Live2DモデルID*/,
-                      time       /*切り替え時間*/){
+                       time       /*切り替え時間*/){
     // キャラを透明からゆっくり表示する
     setTimeout("Live2Dcanvas['" + model_id + "'].alphaChange(0.0);", time);
     TYRANO.kag.stat.f.live2d_models[model_id]["can_opacity"] = 0;
@@ -658,8 +715,8 @@ function live2d_hide( model_id   /*Live2DモデルID*/,
 * Live2Dキャラの透明度
 */
 function live2d_opacity( model_id   /*Live2DモデルID*/,
-                         opacity    /*Canvasの透明度*/,
-                         time       /*切り替え時間*/){
+                          opacity    /*Canvasの透明度*/,
+                          time       /*切り替え時間*/){
     // キャラを透明度をゆっくり切り替える
     setTimeout("Live2Dcanvas['" + model_id + "'].alphaChange(" + opacity + ");", time);
     TYRANO.kag.stat.f.live2d_models[model_id]["opacity"] = opacity;
@@ -669,13 +726,13 @@ function live2d_opacity( model_id   /*Live2DモデルID*/,
 * Live2Dキャラの退場
 */
 function live2d_delete(model_id     /*Live2DモデルID*/,
-                       paraent_id   /*親ID*/){
+                        paraent_id   /*親ID*/){
     // キャラを透明にしていく
     Live2Dcanvas[model_id].alphaChange(0.0);
     // キャンバスを削除する
     setTimeout("live2d_Canvas_delete('" + model_id + "','" + paraent_id + "');",3000);
 
-     delete TYRANO.kag.stat.f.live2d_models[model_id];
+    delete TYRANO.kag.stat.f.live2d_models[model_id];
 
 }
 
@@ -683,7 +740,7 @@ function live2d_delete(model_id     /*Live2DモデルID*/,
 * キャンバス削除
 */
 function live2d_Canvas_delete(model_id      /*Live2Dモデル名*/,
-                              paraent_id    /*親ID*/){
+                               paraent_id    /*親ID*/){
     $("#Live2D_"+model_id).remove();
     Live2Dcanvas[model_id] = null;
 }
