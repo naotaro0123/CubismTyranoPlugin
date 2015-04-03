@@ -34,8 +34,8 @@ if(f.live2d_models == undefined){
 [iscript]
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
-if(mp.left == null)mp.left = 100;
-if(mp.top == null)mp.top = 90;
+if(mp.left == null)mp.left = 0;
+if(mp.top == null)mp.top = 0;
 if(mp.width == null)mp.width = 400;
 if(mp.height == null)mp.height = 400;
 if(mp.zindex == null)mp.zindex = 12;
@@ -70,13 +70,18 @@ live2d_new(
 [macro name = "live2d_show"]
 ;*パラメータ1  : name         【必須】Live2DモデルID(一意なもの)
 ;*パラメータ2  : time                切り替え時間
+;*パラメータ3  : left                切り替え時間
+;*パラメータ4  : top                切り替え時間
+
 [iscript]
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
 if(mp.time == null)mp.time = 100;
+if(mp.left == null)mp.left = 0;
+if(mp.top == null)mp.top = 0;
 
 ; Live2Dモデルの表示[Live2Dtyrano.js]
-live2d_show(mp.name, mp.time);
+live2d_show(mp.name, mp.time,mp.left,mp.top);
 [endscript]
 [endmacro]
 

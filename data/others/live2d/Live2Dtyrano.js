@@ -73,6 +73,8 @@ var Live2Dcanvas = [];      // canvas
         this.pose = null;
         // 物理演算
         this.physics = null;
+        
+        this.visible = false; //表示状態か？
 
         // canvasオブジェクトを取得
         this.canvas = document.getElementById(canvasid);
@@ -273,6 +275,10 @@ var Live2Dcanvas = [];      // canvas
                 -that.modelscale/2+that.pointX, that.modelscale/2+that.pointY, 0, 1
             ];
             that.live2DModel.setMatrix(matrix4x4);
+        }
+        
+        if(that.visible == false){
+            return;
         }
 
         // アイドルモーション以外の場合（フラグで判定する）
@@ -555,6 +561,13 @@ var Live2Dcanvas = [];      // canvas
         // optional
         if(opacity == null) opacity = 1.0;
         if(time == null) time = "1.0s";
+        
+        if(opacity <= 0){
+            this.visible = false;
+        }else{
+            this.visible = true;
+        }
+        
         this.canvas.style.opacity = opacity;
         this.canvas.style.webkitTransitionDuration = time;
         this.canvas.style.webkitTransitionTimingFunction = "ease-out";
@@ -695,7 +708,24 @@ function _live2d_create( model_id      /*Live2DモデルID*/,
 * Live2Dキャラの表示
 */
 function live2d_show( model_id   /*Live2DモデルID*/,
-                       time       /*切り替え時間*/){
+                       time       /*切り替え時間*/ ,
+                       left,
+                       top){
+    
+    
+    if(left == null) left = 0;
+    if(top == null) top = 0;        
+    
+    if(left!=0 || top!=0){
+        
+        Live2Dcanvas[model_id].transChange(left,top,"0");
+                      
+    }
+    
+    //$("#Live2D_"+model_id).css({"left":200,"top":top});               
+    
+    Live2Dcanvas[model_id].transChange(left,top,"0");
+                           
     // キャラを透明からゆっくり表示する
     setTimeout("Live2Dcanvas['" + model_id + "'].alphaChange(1.0);", time);
     TYRANO.kag.stat.f.live2d_models[model_id]["can_opacity"] = 1;
