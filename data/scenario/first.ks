@@ -5,7 +5,7 @@
 ;live2dプラグインを読込
 [call storage="live2d/live2d.ks"]
 ; Live2Dモデルの生成（ハル）
-[live2d_new name="haru" left=100 top=100 ]
+[live2d_new name="haru" left=0 top=0 glscale=1.5]
 ; Live2Dモデルの生成（イプシロン）
 [live2d_new name="Epsilon" top=100 left="100" glscale=1.3 width=460 height=460]
 
