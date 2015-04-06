@@ -34,15 +34,15 @@ if(f.live2d_models == undefined){
 [iscript]
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
-if(mp.left == null)mp.left = 100;
-if(mp.top == null)mp.top = 90;
-if(mp.width == null)mp.width = 400;
-if(mp.height == null)mp.height = 400;
+if(mp.left == null)mp.left = 0;
+if(mp.top == null)mp.top = 0;
+if(mp.width == null)mp.width = TYRANO.kag.config.scWidth;
+if(mp.height == null)mp.height = TYRANO.kag.config.scWidth;
 if(mp.zindex == null)mp.zindex = 12;
 if(mp.opacity == null)mp.opacity = 0.0;
 if(mp.glleft == null)mp.glleft = 0.0;
 if(mp.gltop == null)mp.gltop = 0.0;
-if(mp.glscale == null)mp.glscale = 2.0;
+if(mp.glscale == null)mp.glscale = 1.0;
 
 ; Live2DのCanvas追加する親ID
 parentID = 'tyrano_base';
@@ -70,13 +70,21 @@ live2d_new(
 [macro name = "live2d_show"]
 ;*パラメータ1  : name         【必須】Live2DモデルID(一意なもの)
 ;*パラメータ2  : time                切り替え時間
+;*パラメータ3  : left                横位置
+;*パラメータ4  : top                縦位置
+;*パラメータ5  : scale                比率
+
+
 [iscript]
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
 if(mp.time == null)mp.time = 100;
+if(mp.left == null)mp.left = 0;
+if(mp.top == null)mp.top = 0;
+if(mp.scale == null)mp.scale = 1;
 
 ; Live2Dモデルの表示[Live2Dtyrano.js]
-live2d_show(mp.name, mp.time);
+live2d_show(mp.name, mp.time,mp.left,mp.top,mp.scale);
 [endscript]
 [endmacro]
 
