@@ -28,6 +28,7 @@ if(f.live2d_models == undefined){
 ; パラメータ5  : height       Live2Dモデルの縦幅(Canvasの縦幅)
 ; パラメータ6  : zindex       Live2Dモデルの奥行き(Canvasの奥行き)
 ; パラメータ7  : opacity      Live2Dモデルの透明度（0.0〜1.0）
+; ぱらめーた　　can_visible Live2Dモデルの表示、非表示制御
 ; パラメータ8  : glleft       Canvas内のLive2Dモデル横位置(0.0〜2.0ぐらい)
 ; パラメータ9  : gltop        Canvas内のLive2Dモデル縦位置(0.0〜2.0ぐらい)
 ; パラメータ10 : glscale      Canvas内のLive2Dモデル拡大縮小サイズ(0.0〜2.0ぐらい)
@@ -40,6 +41,7 @@ if(mp.width == null)mp.width = TYRANO.kag.config.scWidth;
 if(mp.height == null)mp.height = TYRANO.kag.config.scWidth;
 if(mp.zindex == null)mp.zindex = 12;
 if(mp.opacity == null)mp.opacity = 0.0;
+if(mp.can_visible == null)mp.can_visible = false;
 if(mp.glleft == null)mp.glleft = 0.0;
 if(mp.gltop == null)mp.gltop = 0.0;
 if(mp.glscale == null)mp.glscale = 1.0;
@@ -56,6 +58,7 @@ live2d_new(
     mp.height,
     mp.zindex,
     mp.opacity,
+    mp.can_visible,
     Number(mp.glleft),
     Number(mp.gltop),
     Number(mp.glscale),
@@ -241,7 +244,7 @@ Live2Dcanvas[mp.name].vibration();
 var live2d_models = TG.stat.f.live2d_models;
 for (var name in live2d_models){
     var model = live2d_models[name];
-    console.log(model);
+    
     ; live2D を作成する
     live2d_new(
         model["model_def"],
@@ -252,11 +255,15 @@ for (var name in live2d_models){
         model["can_height"],
         model["can_zindex"],
         model["can_opacity"],
+        model["can_visible"],
         model["gl_left"],
         model["gl_top"],
         model["gl_scale"],
         model["paraent_id"]
     );
+    
+    
+    
 }
 [endscript]
 [endmacro]

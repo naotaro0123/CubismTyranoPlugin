@@ -436,15 +436,8 @@ var Live2Dcanvas = [];      // canvas
         request.open("GET", path , true);
         request.responseType = "arraybuffer";
         request.onload = function(){
-            switch( request.status ){
-                case 200:
-                    callback( request.response );
-                    break;
-                default:
-                    console.log( "Failed to load (" + request.status + ") : " + path );
-                    break;
-            }
-        }
+            callback( request.response );
+        };
         request.send(null);
         return request;
     };
@@ -613,6 +606,7 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
                       can_height     /*Canvasの高さ*/,
                       can_zindex     /*Canvasの奥行き*/,
                       can_opacity    /*Canvasの透明度*/,
+                      can_visible    /*Canvasの表示制御*/,
                       gl_left        /*Canvas内のLive2DモデルのX位置*/,
                       gl_top         /*Canvas内のLive2DモデルのY位置*/,
                       gl_scale       /*Canvas内のLive2Dモデルのスケール*/,
@@ -626,9 +620,14 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
     if(can_height == null)can_height = TYRANO.kag.config.scWidth;
     if(can_zindex == null)can_zindex = 12;
     if(can_opacity == null)can_opacity = 0.0;
+    if(can_visible == null)can_visible = false;
     if(gl_left == null)gl_left = 0.0;
     if(gl_top == null)gl_top = 0.0;
     if(gl_scale == null)gl_scale = 1.0;
+
+    if($("#Live2D_" + model_id).get(0)){
+        $("#Live2D_" + model_id).remove();
+    }
 
     var ele = document.createElement('canvas');
     ele.id = "Live2D_" + model_id;
@@ -658,6 +657,7 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
         "can_height":can_height,   /*Canvasの高さ*/
         "can_zindex":can_zindex,   /*Canvasの奥行き*/
         "can_opacity":can_opacity, /*Canvasの透明度*/
+        "can_visible":can_visible, /*Canvasの表示制御*/
         "gl_left":gl_left,         /*Canvas内のLive2DモデルのX位置*/
         "gl_top":gl_top,           /*Canvas内のLive2DモデルのY位置*/
         "gl_scale":gl_scale,       /*Canvas内のLive2Dモデルのスケール*/
@@ -665,9 +665,31 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
     };
 
     // model.jsonをロードする
+    
+    var file_url = model_def.filepath + model_def.modeljson;
+    $.loadText(file_url,function(text_str){
+        
+        var jsondata = JSON.parse(text_str);
+        // Live2Dモデルの生成
+        _live2d_create(model_id, live2d_model, ele.id, model_def.filepath, jsondata, gl_left, gl_top, gl_scale, can_opacity, can_visible);
+    });
+    
+    return;
+    
+    //////////以下、無効
+    /*
     var request = new XMLHttpRequest();
+    console.log(model_def.filepath + model_def.modeljson);
     request.open("GET", model_def.filepath + model_def.modeljson, true);
+    console.log("ここは通る");
+    
     request.onreadystatechange = function(){
+        
+        console.log("ggggggggg");
+        console.log(request.readyState);
+        console.log(request.status == 200);
+        console.log(request);
+        
         if(request.readyState == 4 && request.status == 200){
             // model.jsonから取得
             var jsondata = JSON.parse(request.responseText);
@@ -676,6 +698,8 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
         }
     }
     request.send(null);
+    
+    */
 
 }
 
@@ -690,12 +714,18 @@ function _live2d_create( model_id      /*Live2DモデルID*/,
                           gl_left       /*Canvas内のLive2DモデルのX位置*/,
                           gl_top        /*Canvas内のLive2DモデルのY位置*/,
                           gl_scale      /*Canvas内のLive2Dモデルのスケール*/,
-                          can_opacity   /*Canvasの透明度*/
+                          can_opacity   /*Canvasの透明度*/,
+                          can_visible
                          ){
+
+    
 
     TYRANO.kag.stat.f.live2d_models[model_id] = live2d_model;
     Live2Dcanvas[model_id] = new Live2Dtyrano(eleid, filepath, jsondata, gl_left, gl_top, gl_scale);
     Live2Dcanvas[model_id].alphaChange(can_opacity);
+    Live2Dcanvas[model_id].visible = can_visible;
+    
+    
 }
 
 
@@ -712,6 +742,7 @@ function live2d_show( model_id   /*Live2DモデルID*/,
     if(left == null) left = 0;
     if(top == null) top = 0;        
     if(scale == null) scale = 1.0;
+    
     
     if(left!=0 || top!=0){
         Live2Dcanvas[model_id].transChange(left,top,"0");
@@ -732,6 +763,11 @@ function live2d_show( model_id   /*Live2DモデルID*/,
     }, time,model_id);
     
     TYRANO.kag.stat.f.live2d_models[model_id]["can_opacity"] = 1;
+    TYRANO.kag.stat.f.live2d_models[model_id]["can_visible"] = true;
+    TYRANO.kag.stat.f.live2d_models[model_id]["can_left"] = left;
+    TYRANO.kag.stat.f.live2d_models[model_id]["can_top"] = top;
+    
+    
 }
 
 /**
@@ -749,6 +785,8 @@ function live2d_hide( model_id   /*Live2DモデルID*/,
     }, time,model_id);
     
     TYRANO.kag.stat.f.live2d_models[model_id]["can_opacity"] = 0;
+    TYRANO.kag.stat.f.live2d_models[model_id]["can_visible"] = false;
+    
 }
 
 /**
@@ -760,6 +798,7 @@ function live2d_opacity( model_id   /*Live2DモデルID*/,
     // キャラを透明度をゆっくり切り替える
     setTimeout("Live2Dcanvas['" + model_id + "'].alphaChange(" + opacity + ");", time);
     TYRANO.kag.stat.f.live2d_models[model_id]["opacity"] = opacity;
+    
 }
 
 /**
@@ -773,6 +812,7 @@ function live2d_delete(model_id     /*Live2DモデルID*/,
     setTimeout("live2d_Canvas_delete('" + model_id + "','" + paraent_id + "');",3000);
 
     delete TYRANO.kag.stat.f.live2d_models[model_id];
+    
 
 }
 
