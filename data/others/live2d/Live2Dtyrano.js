@@ -1,5 +1,19 @@
 var Live2Dcanvas = [];      // canvas
 
+var v_prefix = "";
+
+var browser=$.getBrowser();
+
+if(browser == "chrome" || browser == "safari"){
+    v_prefix = "webkit";
+}else if(browser == "msie"){
+    v_prefix = "ms";
+}else if(browser =="firefox"){
+    v_prefix = "Moz";
+}else if(browser =="opera"){
+    v_prefix = "o";
+}
+
 (function(window){
 
     // Live2Dの初期化
@@ -478,9 +492,9 @@ var Live2Dcanvas = [];      // canvas
         if(time == null) time = "2.0s";
         this.trans = "translate(" + left + "px ," + top + "px)";
         this.transX = left;
-        this.canvas.style.webkitTransform = this.trans + this.rotate + this.scale;
-        this.canvas.style.webkitTransitionDuration = time;
-        this.canvas.style.webkitTransitionTimingFunction = "ease-out";
+        this.canvas.style[v_prefix+"Transform"] = this.trans + this.rotate + this.scale;
+        this.canvas.style[v_prefix+"TransitionDuration"] = time;
+        this.canvas.style[v_prefix+"TransitionTimingFunction"] = "ease-out";
     };
 
 
@@ -497,9 +511,9 @@ var Live2Dcanvas = [];      // canvas
         }
         if(time == null) time = "2.0s";
         this.rotate = "rotate(" + this.degs + "deg)";
-        this.canvas.style.webkitTransform = this.trans + this.rotate + this.scale;
-        this.canvas.style.webkitTransitionDuration = time;
-        this.canvas.style.webkitTransitionTimingFunction = "ease-out";
+        this.canvas.style[v_prefix+"Transform"] = this.trans + this.rotate + this.scale;
+        this.canvas.style[v_prefix+"TransitionDuration"] = time;
+        this.canvas.style[v_prefix+"TransitionTimingFunction"] = "ease-out";
     };
 
 
@@ -514,9 +528,9 @@ var Live2Dcanvas = [];      // canvas
         if(scaleY == null) scaleY = 0;
         if(time == null) time = "1.0s";
         this.scale = "scale(" + scaleX + "," + scaleY + ")";
-        this.canvas.style.webkitTransform = this.trans + this.rotate + this.scale;
-        this.canvas.style.webkitTransitionDuration = time;
-        this.canvas.style.webkitTransitionTimingFunction = "ease-out";
+        this.canvas.style[v_prefix+"Transform"] = this.trans + this.rotate + this.scale;
+        this.canvas.style[v_prefix+"TransitionDuration"] = time;
+        this.canvas.style[v_prefix+"TransitionTimingFunction"] = "ease-out";
     };
 
 
@@ -556,8 +570,9 @@ var Live2Dcanvas = [];      // canvas
         if(time == null) time = "1.0s";
         
         this.canvas.style.opacity = opacity;
-        this.canvas.style.webkitTransitionDuration = time;
-        this.canvas.style.webkitTransitionTimingFunction = "ease-out";
+        this.canvas.style[v_prefix+"TransitionDuration"] = time;
+        this.canvas.style[v_prefix+"TransitionTimingFunction"] = "ease-out";
+       
     };
 
 
