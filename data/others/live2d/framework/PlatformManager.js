@@ -122,7 +122,7 @@ PlatformManager.prototype.jsonParseFromBytes = function(buf){
     if (bomCode[0] == 239 && bomCode[1] == 187 && bomCode[2] == 191) {
         jsonStr = String.fromCharCode.apply(null, new Uint8Array(buf, 3));
     } else {
-        jsonStr = String.fromCharCode.apply(null, new Unit8Array(buf));
+        jsonStr = String.fromCharCode.apply(null, new Uint8Array(buf));
     }
 
     var jsonObj = JSON.parse(jsonStr);
