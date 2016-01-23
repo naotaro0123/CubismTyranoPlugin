@@ -782,6 +782,7 @@ function live2d_show( model_id   /*Live2DモデルID*/,
     TYRANO.kag.stat.f.live2d_models[model_id]["can_visible"] = true;
     TYRANO.kag.stat.f.live2d_models[model_id]["can_left"] = left;
     TYRANO.kag.stat.f.live2d_models[model_id]["can_top"] = top;
+    TYRANO.kag.stat.f.live2d_models[model_id]["gl_scale"] = scale;
     
     
 }
