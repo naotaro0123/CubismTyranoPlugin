@@ -485,7 +485,8 @@ if(browser == "chrome" || browser == "safari"){
     /**
     * キャラクターの移動
     */
-    Live2Dtyrano.prototype.transChange = function( left     /*CanvasのX位置*/,
+    Live2Dtyrano.prototype.transChange = function( model_id,
+                                                    left     /*CanvasのX位置*/,
                                                     top      /*CanvasのY位置*/,
                                                     time     /*アニメーション時間*/){
         // optional
@@ -497,6 +498,9 @@ if(browser == "chrome" || browser == "safari"){
         this.canvas.style[v_prefix+"Transform"] = this.trans + this.rotate + this.scale;
         this.canvas.style[v_prefix+"TransitionDuration"] = time;
         this.canvas.style[v_prefix+"TransitionTimingFunction"] = "ease-out";
+        TYRANO.kag.stat.f.live2d_models[model_id]["can_left"] = left;
+        TYRANO.kag.stat.f.live2d_models[model_id]["can_top"] = top;
+        
     };
 
 
@@ -761,14 +765,14 @@ function live2d_show( model_id   /*Live2DモデルID*/,
     if(scale == null) scale = 1.0;
     
     if(left!=0 || top!=0){
-        Live2Dcanvas[model_id].transChange(left,top,"0");
+        Live2Dcanvas[model_id].transChange(model_id,left,top,"0");
     }
 
     Live2Dcanvas[model_id].scaleChange(scale,scale,"0");
 
     //$("#Live2D_"+model_id).css({"left":200,"top":top});
 
-    Live2Dcanvas[model_id].transChange(left,top,"0");
+    Live2Dcanvas[model_id].transChange(model_id,left,top,"0");
 
     // キャラを透明からゆっくり表示する
     var that = this;
