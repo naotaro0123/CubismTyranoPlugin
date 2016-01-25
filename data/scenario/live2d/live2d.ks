@@ -28,6 +28,7 @@ if(f.live2d_models == undefined){
 ; パラメータ5  : height       Live2Dモデルの縦幅(Canvasの縦幅)
 ; パラメータ6  : zindex       Live2Dモデルの奥行き(Canvasの奥行き)
 ; パラメータ7  : opacity      Live2Dモデルの透明度（0.0〜1.0）
+; ぱらめーた　　can_visible Live2Dモデルの表示、非表示制御
 ; パラメータ8  : glleft       Canvas内のLive2Dモデル横位置(0.0〜2.0ぐらい)
 ; パラメータ9  : gltop        Canvas内のLive2Dモデル縦位置(0.0〜2.0ぐらい)
 ; パラメータ10 : glscale      Canvas内のLive2Dモデル拡大縮小サイズ(0.0〜2.0ぐらい)
@@ -40,6 +41,7 @@ if(mp.width == null)mp.width = TYRANO.kag.config.scWidth;
 if(mp.height == null)mp.height = TYRANO.kag.config.scWidth;
 if(mp.zindex == null)mp.zindex = 12;
 if(mp.opacity == null)mp.opacity = 0.0;
+if(mp.can_visible == null)mp.can_visible = false;
 if(mp.glleft == null)mp.glleft = 0.0;
 if(mp.gltop == null)mp.gltop = 0.0;
 if(mp.glscale == null)mp.glscale = 1.0;
@@ -56,6 +58,7 @@ live2d_new(
     mp.height,
     mp.zindex,
     mp.opacity,
+    mp.can_visible,
     Number(mp.glleft),
     Number(mp.gltop),
     Number(mp.glscale),
@@ -176,7 +179,7 @@ if(mp.left ==null)console.error('leftは必須です');
 if(mp.top ==null)console.error('topは必須です');
 if(mp.time == null)mp.time = 100;
 ; Live2Dモデルの移動[Live2Dtyrano.js]
-Live2Dcanvas[mp.name].transChange(mp.left, mp.top, mp.time);
+Live2Dcanvas[mp.name].transChange(mp.name,mp.left, mp.top, mp.time);
 [endscript]
 [endmacro]
 
@@ -232,31 +235,52 @@ Live2Dcanvas[mp.name].vibration();
 [endscript]
 [endmacro]
 
-
 ;------------------------------------------------------------
 ; Live2Dモデルの復元（セーブ対応）
 ;------------------------------------------------------------
 [macro name = "live2d_restore"]
+
 [iscript]
+
 var live2d_models = TG.stat.f.live2d_models;
+
+tf.i = 0;
+
+tf.models = live2d_models;
+tf.array_models = [];
+var index=0;
 for (var name in live2d_models){
-    var model = live2d_models[name];
-    console.log(model);
-    ; live2D を作成する
-    live2d_new(
-        model["model_def"],
-        model["model_id"],
-        model["can_left"],
-        model["can_top"],
-        model["can_width"],
-        model["can_height"],
-        model["can_zindex"],
-        model["can_opacity"],
-        model["gl_left"],
-        model["gl_top"],
-        model["gl_scale"],
-        model["paraent_id"]
-    );
+	live2d_models[name]["name"] = name;
+    tf.array_models[index] = live2d_models[name];
+    index++;
 }
+
+tf.cnt_model = tf.array_models.length;
+
 [endscript]
+
+*point
+
+[iscript]
+	
+	tf.model_name=tf.array_models[tf.i]["name"];
+	tf.model_left=tf.array_models[tf.i]["can_left"];
+	tf.model_top = tf.array_models[tf.i]["can_top"];
+	tf.model_scale = tf.array_models[tf.i]["gl_scale"];
+	tf.model_visible = tf.array_models[tf.i]["can_visible"];
+	
+	tf.i++;
+	
+[endscript]
+
+@live2d_new name=&tf.model_name
+
+[if exp="tf.model_visible == true"]
+@live2d_show name=&tf.model_name left=&tf.model_left top=&tf.model_top scale=&tf.model_scale 
+[endif]
+
+[if exp="tf.i < tf.cnt_model"]
+@jump target="point"
+[endif]
+
 [endmacro]
