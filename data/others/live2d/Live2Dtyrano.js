@@ -507,7 +507,8 @@ if(browser == "chrome" || browser == "safari"){
     /**
     * キャラクターの回転
     */
-    Live2Dtyrano.prototype.rotateChange= function( deg  /*Canvasの回転角度*/,
+    Live2Dtyrano.prototype.rotateChange= function(  model_id,
+    												deg  /*Canvasの回転角度*/,
                                                     time /*アニメーション時間*/){
         // optional
         if(deg == null){
@@ -520,6 +521,8 @@ if(browser == "chrome" || browser == "safari"){
         this.canvas.style[v_prefix+"Transform"] = this.trans + this.rotate + this.scale;
         this.canvas.style[v_prefix+"TransitionDuration"] = time;
         this.canvas.style[v_prefix+"TransitionTimingFunction"] = "ease-out";
+        TYRANO.kag.stat.f.live2d_models[model_id]["rotate"] = deg;
+        
     };
 
 
@@ -681,6 +684,7 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
         "can_visible":can_visible, /*Canvasの表示制御*/
         "gl_left":gl_left,         /*Canvas内のLive2DモデルのX位置*/
         "gl_top":gl_top,           /*Canvas内のLive2DモデルのY位置*/
+        "scale":1,  //スケール情報。chara_newの時は1でおｋ
         "gl_scale":gl_scale,       /*Canvas内のLive2Dモデルのスケール*/
         "paraent_id":paraent_id
     };
@@ -786,7 +790,7 @@ function live2d_show( model_id   /*Live2DモデルID*/,
     TYRANO.kag.stat.f.live2d_models[model_id]["can_visible"] = true;
     TYRANO.kag.stat.f.live2d_models[model_id]["can_left"] = left;
     TYRANO.kag.stat.f.live2d_models[model_id]["can_top"] = top;
-    TYRANO.kag.stat.f.live2d_models[model_id]["gl_scale"] = scale;
+    TYRANO.kag.stat.f.live2d_models[model_id]["scale"] = scale;
     
     
 }
