@@ -286,18 +286,18 @@ tf.cnt_model = tf.array_models.length;
 
 @live2d_new name=&tf.model_name width=&tf.model_width height=&tf.model_height glscale=&tf.model_glscale
 
-[if exp="tf.model_rotate != 0"]
+[if exp="tf.model_rotate!=0"]
 @live2d_rotate name=&tf.model_name rotate=&tf.model_rotate time="0"
 [endif]
 
-[if exp="tf.model_visible == true"]
+[if exp="tf.model_visible==true"]
 @live2d_show name=&tf.model_name left=&tf.model_left top=&tf.model_top scale=&tf.model_scale 
 [endif]
 
 
 
 
-[if exp="tf.i < tf.cnt_model"]
+[if exp="tf.i<tf.cnt_model"]
 @jump target="point"
 [endif]
 
