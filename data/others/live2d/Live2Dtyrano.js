@@ -89,6 +89,9 @@ if(browser == "chrome" || browser == "safari"){
         this.physics = null;
 
         this.visible = false; //表示状態か？
+        
+        this.check_delete = 0; //0:再生 1:一時停止 2: 削除
+
 
         // canvasオブジェクトを取得
         this.canvas = document.getElementById(canvasid);
@@ -178,15 +181,27 @@ if(browser == "chrome" || browser == "safari"){
 
         //------------ 描画ループ ------------
         (function tick() {
-            that.draw(gl,that); // 1回分描画
-
-            var requestAnimationFrame =
-                window.requestAnimationFrame ||
-                window.mozRequestAnimationFrame ||
-                window.webkitRequestAnimationFrame ||
-                window.msRequestAnimationFrame;
-            // 一定時間後に自身を呼び出す
-            that.requestID = requestAnimationFrame( tick , that.canvas );
+            
+            //削除時はループ解除
+            if(that.check_delete < 2){
+                
+                // 1回分描画
+                if(that.check_delete==0){
+                    that.draw(gl,that); 
+                }
+                
+                var requestAnimationFrame =
+                    window.requestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    window.webkitRequestAnimationFrame ||
+                    window.msRequestAnimationFrame;
+                // 一定時間後に自身を呼び出す
+                that.requestID = requestAnimationFrame( tick , that.canvas );
+                
+            }else if(that.check_delete==2){
+                return;
+            }
+            
         })();
     };
 
@@ -778,6 +793,11 @@ function live2d_show( model_id   /*Live2DモデルID*/,
 
     Live2Dcanvas[model_id].transChange(model_id,left,top,"0");
 
+    //非表示からの復帰の場合、再度アニメーション
+    if(Live2Dcanvas[model_id].check_delete == 1){
+        Live2Dcanvas[model_id].check_delete = 0;
+    }
+    
     // キャラを透明からゆっくり表示する
     var that = this;
 
@@ -807,6 +827,8 @@ function live2d_hide( model_id   /*Live2DモデルID*/,
     setTimeout(function(model_id){
         Live2Dcanvas[model_id].visible = true;
         Live2Dcanvas[model_id].alphaChange(0.0);
+        Live2Dcanvas[model_id].check_delete = 1;
+    
     }, time,model_id);
 
     TYRANO.kag.stat.f.live2d_models[model_id]["can_opacity"] = 0;
@@ -834,6 +856,8 @@ function live2d_delete(model_id     /*Live2DモデルID*/,
     // キャラを透明にしていく
     Live2Dcanvas[model_id].alphaChange(0.0);
     // キャンバスを削除する
+    Live2Dcanvas[model_id].check_delete = 2;
+    
     setTimeout("live2d_Canvas_delete('" + model_id + "','" + paraent_id + "');",3000);
 
     delete TYRANO.kag.stat.f.live2d_models[model_id];
