@@ -159,7 +159,7 @@ if(mp.name ==null)console.error('nameは必須です');
 if(mp.filenm == null)mp.filenm = '';
 if(mp.idle == null)mp.idle = '';
 ; Live2Dモデルのモーション再生[Live2Dtyrano.js]
-Live2Dcanvas[mp.name].motionChange(mp.filenm, mp.idle);
+Live2Dcanvas[mp.name].motionChange(mp.name, mp.filenm, mp.idle);
 [endscript]
 [endmacro]
 
@@ -274,6 +274,13 @@ tf.cnt_model = tf.array_models.length;
 	tf.model_width  = tf.array_models[tf.i]["can_width"];
 	tf.model_height = tf.array_models[tf.i]["can_height"];
 	
+	//モーションはアイドル指定の場合のみ
+	if(tf.array_models[tf.i]["motion"]){
+		tf.model_motion = tf.array_models[tf.i]["motion"];
+	}else{
+		tf.model_motion = "";
+	}
+	
 	if(tf.array_models[tf.i]["rotate"]){
 		tf.model_rotate = tf.array_models[tf.i]["rotate"];
 	}else{
@@ -294,7 +301,9 @@ tf.cnt_model = tf.array_models.length;
 @live2d_show name=&tf.model_name left=&tf.model_left top=&tf.model_top scale=&tf.model_scale 
 [endif]
 
-
+[if exp="tf.model_motion!=''"]
+@live2d_motion name=&tf.model_name filenm=&tf.model_motion idle="ON" 
+[endif]
 
 
 [if exp="tf.i<tf.cnt_model"]

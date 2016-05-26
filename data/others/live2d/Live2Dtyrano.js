@@ -477,7 +477,7 @@ if(browser == "chrome" || browser == "safari"){
     /**
     * モーション切り替え
     */
-    Live2Dtyrano.prototype.motionChange = function(mtnfilenm/*モーションファイル名*/,
+    Live2Dtyrano.prototype.motionChange = function(model_id,mtnfilenm/*モーションファイル名*/,
                                                     idle/*アイドリング有無*/){
         var cnt = 0;
         // ファイル名からファイル番号を取り出す
@@ -492,6 +492,9 @@ if(browser == "chrome" || browser == "safari"){
         // アイドルフラグがONなら、指定したモーションをアイドリングさせる
         if(idle != ''){
             this.idlemotion = cnt;
+            //モーションを保存する
+            TYRANO.kag.stat.f.live2d_models[model_id]["motion"] = mtnfilenm;
+    
         }
         this.motionflg = true;
     };
@@ -701,7 +704,8 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
         "gl_top":gl_top,           /*Canvas内のLive2DモデルのY位置*/
         "scale":1,  //スケール情報。chara_newの時は1でおｋ
         "gl_scale":gl_scale,       /*Canvas内のLive2Dモデルのスケール*/
-        "paraent_id":paraent_id
+        "paraent_id":paraent_id,
+        "motion":"" //モーション
     };
 
     // model.jsonをロードする
