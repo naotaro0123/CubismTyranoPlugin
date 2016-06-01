@@ -711,11 +711,25 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
     // model.jsonをロードする
     
     var file_url = model_def.filepath + model_def.modeljson;
-    $.loadText(file_url,function(text_str){
-        
-        var jsondata = JSON.parse(text_str);
-        // Live2Dモデルの生成
-        _live2d_create(model_id, live2d_model, ele.id, model_def.filepath, jsondata, gl_left, gl_top, gl_scale, can_opacity, can_visible);
+    
+    var httpObj = jQuery.get(file_url + "?" + Math.floor(Math.random() * 1000000), null, function(obj) {
+            
+            var order_str = "";
+
+            if (httpObj) {
+                if (httpObj.responseText) {
+                    order_str = httpObj.responseText;
+                } else {
+                    order_str = obj;
+                }
+            } else {
+                order_str = obj;
+            }
+            
+           var jsondata = JSON.parse(order_str);
+           // Live2Dモデルの生成
+           _live2d_create(model_id, live2d_model, ele.id, model_def.filepath, jsondata, gl_left, gl_top, gl_scale, can_opacity, can_visible);
+                
     });
     
     return;
