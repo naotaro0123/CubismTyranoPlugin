@@ -89,6 +89,9 @@ if(browser == "chrome" || browser == "safari"){
         this.physics = null;
 
         this.visible = false; //表示状態か？
+        
+        this.check_delete = 0; //0:再生 1:一時停止 2: 削除
+
 
         // canvasオブジェクトを取得
         this.canvas = document.getElementById(canvasid);
@@ -178,15 +181,27 @@ if(browser == "chrome" || browser == "safari"){
 
         //------------ 描画ループ ------------
         (function tick() {
-            that.draw(gl,that); // 1回分描画
-
-            var requestAnimationFrame =
-                window.requestAnimationFrame ||
-                window.mozRequestAnimationFrame ||
-                window.webkitRequestAnimationFrame ||
-                window.msRequestAnimationFrame;
-            // 一定時間後に自身を呼び出す
-            that.requestID = requestAnimationFrame( tick , that.canvas );
+            
+            //削除時はループ解除
+            if(that.check_delete < 2){
+                
+                // 1回分描画
+                if(that.check_delete==0){
+                    that.draw(gl,that); 
+                }
+                
+                var requestAnimationFrame =
+                    window.requestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    window.webkitRequestAnimationFrame ||
+                    window.msRequestAnimationFrame;
+                // 一定時間後に自身を呼び出す
+                that.requestID = requestAnimationFrame( tick , that.canvas );
+                
+            }else if(that.check_delete==2){
+                return;
+            }
+            
         })();
     };
 
@@ -462,7 +477,7 @@ if(browser == "chrome" || browser == "safari"){
     /**
     * モーション切り替え
     */
-    Live2Dtyrano.prototype.motionChange = function(mtnfilenm/*モーションファイル名*/,
+    Live2Dtyrano.prototype.motionChange = function(model_id,mtnfilenm/*モーションファイル名*/,
                                                     idle/*アイドリング有無*/){
         var cnt = 0;
         // ファイル名からファイル番号を取り出す
@@ -477,6 +492,9 @@ if(browser == "chrome" || browser == "safari"){
         // アイドルフラグがONなら、指定したモーションをアイドリングさせる
         if(idle != ''){
             this.idlemotion = cnt;
+            //モーションを保存する
+            TYRANO.kag.stat.f.live2d_models[model_id]["motion"] = mtnfilenm;
+    
         }
         this.motionflg = true;
     };
@@ -507,7 +525,8 @@ if(browser == "chrome" || browser == "safari"){
     /**
     * キャラクターの回転
     */
-    Live2Dtyrano.prototype.rotateChange= function( deg  /*Canvasの回転角度*/,
+    Live2Dtyrano.prototype.rotateChange= function(  model_id,
+    												deg  /*Canvasの回転角度*/,
                                                     time /*アニメーション時間*/){
         // optional
         if(deg == null){
@@ -520,6 +539,8 @@ if(browser == "chrome" || browser == "safari"){
         this.canvas.style[v_prefix+"Transform"] = this.trans + this.rotate + this.scale;
         this.canvas.style[v_prefix+"TransitionDuration"] = time;
         this.canvas.style[v_prefix+"TransitionTimingFunction"] = "ease-out";
+        TYRANO.kag.stat.f.live2d_models[model_id]["rotate"] = deg;
+        
     };
 
 
@@ -681,18 +702,34 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
         "can_visible":can_visible, /*Canvasの表示制御*/
         "gl_left":gl_left,         /*Canvas内のLive2DモデルのX位置*/
         "gl_top":gl_top,           /*Canvas内のLive2DモデルのY位置*/
+        "scale":1,  //スケール情報。chara_newの時は1でおｋ
         "gl_scale":gl_scale,       /*Canvas内のLive2Dモデルのスケール*/
-        "paraent_id":paraent_id
+        "paraent_id":paraent_id,
+        "motion":"" //モーション
     };
 
     // model.jsonをロードする
     
     var file_url = model_def.filepath + model_def.modeljson;
-    $.loadText(file_url,function(text_str){
-        
-        var jsondata = JSON.parse(text_str);
-        // Live2Dモデルの生成
-        _live2d_create(model_id, live2d_model, ele.id, model_def.filepath, jsondata, gl_left, gl_top, gl_scale, can_opacity, can_visible);
+    
+    var httpObj = jQuery.get(file_url + "?" + Math.floor(Math.random() * 1000000), null, function(obj) {
+            
+            var order_str = "";
+
+            if (httpObj) {
+                if (httpObj.responseText) {
+                    order_str = httpObj.responseText;
+                } else {
+                    order_str = obj;
+                }
+            } else {
+                order_str = obj;
+            }
+            
+           var jsondata = JSON.parse(order_str);
+           // Live2Dモデルの生成
+           _live2d_create(model_id, live2d_model, ele.id, model_def.filepath, jsondata, gl_left, gl_top, gl_scale, can_opacity, can_visible);
+                
     });
     
     return;
@@ -774,6 +811,11 @@ function live2d_show( model_id   /*Live2DモデルID*/,
 
     Live2Dcanvas[model_id].transChange(model_id,left,top,"0");
 
+    //非表示からの復帰の場合、再度アニメーション
+    if(Live2Dcanvas[model_id].check_delete == 1){
+        Live2Dcanvas[model_id].check_delete = 0;
+    }
+    
     // キャラを透明からゆっくり表示する
     var that = this;
 
@@ -786,7 +828,7 @@ function live2d_show( model_id   /*Live2DモデルID*/,
     TYRANO.kag.stat.f.live2d_models[model_id]["can_visible"] = true;
     TYRANO.kag.stat.f.live2d_models[model_id]["can_left"] = left;
     TYRANO.kag.stat.f.live2d_models[model_id]["can_top"] = top;
-    TYRANO.kag.stat.f.live2d_models[model_id]["gl_scale"] = scale;
+    TYRANO.kag.stat.f.live2d_models[model_id]["scale"] = scale;
     
     
 }
@@ -803,6 +845,8 @@ function live2d_hide( model_id   /*Live2DモデルID*/,
     setTimeout(function(model_id){
         Live2Dcanvas[model_id].visible = true;
         Live2Dcanvas[model_id].alphaChange(0.0);
+        Live2Dcanvas[model_id].check_delete = 1;
+    
     }, time,model_id);
 
     TYRANO.kag.stat.f.live2d_models[model_id]["can_opacity"] = 0;
@@ -830,6 +874,8 @@ function live2d_delete(model_id     /*Live2DモデルID*/,
     // キャラを透明にしていく
     Live2Dcanvas[model_id].alphaChange(0.0);
     // キャンバスを削除する
+    Live2Dcanvas[model_id].check_delete = 2;
+    
     setTimeout("live2d_Canvas_delete('" + model_id + "','" + paraent_id + "');",3000);
 
     delete TYRANO.kag.stat.f.live2d_models[model_id];

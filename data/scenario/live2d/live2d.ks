@@ -27,11 +27,11 @@ if(f.live2d_models == undefined){
 ; パラメータ4  : width        Live2Dモデルの横幅(Canvasの横幅)
 ; パラメータ5  : height       Live2Dモデルの縦幅(Canvasの縦幅)
 ; パラメータ6  : zindex       Live2Dモデルの奥行き(Canvasの奥行き)
-; パラメータ7  : opacity      Live2Dモデルの透明度（0.0〜1.0）
+; パラメータ7  : opacity      Live2Dモデルの透明度（0.0?1.0）
 ; ぱらめーた　　can_visible Live2Dモデルの表示、非表示制御
-; パラメータ8  : glleft       Canvas内のLive2Dモデル横位置(0.0〜2.0ぐらい)
-; パラメータ9  : gltop        Canvas内のLive2Dモデル縦位置(0.0〜2.0ぐらい)
-; パラメータ10 : glscale      Canvas内のLive2Dモデル拡大縮小サイズ(0.0〜2.0ぐらい)
+; パラメータ8  : glleft       Canvas内のLive2Dモデル横位置(0.0?2.0ぐらい)
+; パラメータ9  : gltop        Canvas内のLive2Dモデル縦位置(0.0?2.0ぐらい)
+; パラメータ10 : glscale      Canvas内のLive2Dモデル拡大縮小サイズ(0.0?2.0ぐらい)
 [iscript]
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
@@ -159,7 +159,7 @@ if(mp.name ==null)console.error('nameは必須です');
 if(mp.filenm == null)mp.filenm = '';
 if(mp.idle == null)mp.idle = '';
 ; Live2Dモデルのモーション再生[Live2Dtyrano.js]
-Live2Dcanvas[mp.name].motionChange(mp.filenm, mp.idle);
+Live2Dcanvas[mp.name].motionChange(mp.name, mp.filenm, mp.idle);
 [endscript]
 [endmacro]
 
@@ -197,7 +197,7 @@ if(mp.name ==null)console.error('nameは必須です');
 if(mp.rotate ==null)console.error('rotateは必須です');
 if(mp.time == null)mp.time = 100;
 ; Live2Dモデルの回転[Live2Dtyrano.js]
-Live2Dcanvas[mp.name].rotateChange(mp.rotate, mp.time);
+Live2Dcanvas[mp.name].rotateChange(mp.name,mp.rotate, mp.time);
 [endscript]
 [endmacro]
 
@@ -266,20 +266,47 @@ tf.cnt_model = tf.array_models.length;
 	tf.model_name=tf.array_models[tf.i]["name"];
 	tf.model_left=tf.array_models[tf.i]["can_left"];
 	tf.model_top = tf.array_models[tf.i]["can_top"];
-	tf.model_scale = tf.array_models[tf.i]["gl_scale"];
+	
+	tf.model_glscale = tf.array_models[tf.i]["gl_scale"];
+	tf.model_scale = tf.array_models[tf.i]["scale"];
+	
 	tf.model_visible = tf.array_models[tf.i]["can_visible"];
+	tf.model_width  = tf.array_models[tf.i]["can_width"];
+	tf.model_height = tf.array_models[tf.i]["can_height"];
+	
+	//モーションはアイドル指定の場合のみ
+	if(tf.array_models[tf.i]["motion"]){
+		tf.model_motion = tf.array_models[tf.i]["motion"];
+	}else{
+		tf.model_motion = "";
+	}
+	
+	if(tf.array_models[tf.i]["rotate"]){
+		tf.model_rotate = tf.array_models[tf.i]["rotate"];
+	}else{
+		tf.model_rotate = 0;
+	}
 	
 	tf.i++;
 	
 [endscript]
 
-@live2d_new name=&tf.model_name
+@live2d_new name=&tf.model_name width=&tf.model_width height=&tf.model_height glscale=&tf.model_glscale
 
-[if exp="tf.model_visible == true"]
+[if exp="tf.model_rotate!=0"]
+@live2d_rotate name=&tf.model_name rotate=&tf.model_rotate time="0"
+[endif]
+
+[if exp="tf.model_visible==true"]
 @live2d_show name=&tf.model_name left=&tf.model_left top=&tf.model_top scale=&tf.model_scale 
 [endif]
 
-[if exp="tf.i < tf.cnt_model"]
+[if exp="tf.model_motion!=''"]
+@live2d_motion name=&tf.model_name filenm=&tf.model_motion idle="ON" 
+[endif]
+
+
+[if exp="tf.i<tf.cnt_model"]
 @jump target="point"
 [endif]
 
