@@ -7,7 +7,7 @@
 ; Live2Dモデルの生成（ハル）
 [live2d_new name="haru" left=0 top=0 glscale=1.5]
 ; Live2Dモデルの生成（イプシロン）
-[live2d_new name="Epsilon" top=100 left="100" glscale=1.3 width=460 height=460]
+[live2d_new name="Epsilon" top=100 left="100" glscale=1.8 width=460 height=460]
 
 
 ;メッセージレイヤは最初は非表示
@@ -49,7 +49,9 @@ Live2Dを使う事で今までにないアニメーションを[r]する事が�
 [live2d_rotate name="haru" rotate=360]
 [wait time=2000]
 [live2d_scale name="haru" scaleX=0.5 scaleY=0.5]
+[live2d_rotate name="haru" rotate=-120]
 [wait time=1000]
+[live2d_rotate name="haru" rotate=-240]
 [live2d_scale name="haru" scaleX=1.0 scaleY=1.0]
 [wait time=1500]
 
@@ -73,20 +75,32 @@ Live2Dを使う事で今までにないアニメーションを[r]する事が�
 [wait time=3000]
 [live2d_motion name="haru" filenm="idle_00.mtn" idle="ON"]
 
+
+あとキャラクターの色も変えられるよ[p]
+; haruの色を変える
+[live2d_color name="haru" red=0.3 green=0.3 blue=0.3]
+[wait time=1000]
+; haruを真っ黒に変える
+[live2d_color name="haru" red=0.0 green=0.0 blue=0.0]
+[wait time=1000]
+; haruを元の色に戻す
+[live2d_color name="haru" red=1.0 green=1.0 blue=1.0]
+
+
 友達を紹介するね。イプシロンちゃーんっ！[p]
 [live2d_trans name="haru" left=-200 top=0]
 [wait time=1000]
 
 [live2d_show name="Epsilon"]
-[live2d_trans name="Epsilon" left=100 top=-70]
+[live2d_trans name="Epsilon" left=100 top=-60]
 はいはーい[p]
 [wait time=1000]
 ; アイドルモーションの指定
-[live2d_motion name="Epsilon" filenm="Epsilon_free_idle_01.mtn" idle="ON"]
+[live2d_motion name="Epsilon" filenm="Epsilon2.1_m_04.mtn"]
 
-ねっ、これでLiv2Dを使ったゲームも作れるね！[p]
+ねっ、これでLive2Dを使ったゲームも作れるね！[p]
 [live2d_motion name="haru" filenm="idle_02.mtn"]
-[live2d_motion name="Epsilon" filenm="Epsilon_free_m_sp_01.mtn"]
+[live2d_motion name="Epsilon" filenm="Epsilon2.1_m_sp_01.mtn" idle="ON"]
 じゃあ、ゲーム開発を頑張ってね。[r]ばいばーい[p]
 [live2d_delete name="haru"]
 [live2d_delete name="Epsilon"]

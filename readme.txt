@@ -1,6 +1,6 @@
 CONFIDENTIAL
 ============================================================
-	Live2D x TYRANOSCRIPTプラグイン v1.00
+	Live2D x TYRANOSCRIPTプラグイン v2.00
 	(c) Live2D Inc.
 ============================================================
 ティラノスクリプト上でLive2Dを動かすプラグインです。
@@ -31,6 +31,11 @@ data/others/live2d/lib配下にlibe2d.min.jsを置いて下さい。
 ----------------------------------------
 	リリースノート
 ----------------------------------------
+	2.0.00(2015/03/25)
+		Cubism SDK 2.1対応
+		回転が動作しないバグを修正
+		キャラクターのカラー変更を追加
+
 	1.0.04(2015/03/25)
 		モーション再生に誤作動があったため修正
 		尺が長いモーションはmodel.jsonのidleグループに含めると事前にロードします
@@ -47,6 +52,19 @@ data/others/live2d/lib配下にlibe2d.min.jsを置いて下さい。
 
 	1.0.00(2015/01/27)
 		公開
+
+
+----------------------------------------
+	v1.00→v2.00の変更点
+----------------------------------------
+v2.00からCubism SDK 2.1対応によりクリッピングマスク機能がサポートされます。
+クリッピングマスクはフレームバッファを1モデルにつき1枚生成されます。
+
+	
+また、キャラクターの色変更が追加になりました。
+以下の様なタグでカラーを変更できます。
+
+[live2d_color name="キャラ名" red=0.3 green=0.3 blue=0.3]
 
 
 ----------------------------------------
@@ -141,6 +159,15 @@ https://sites.google.com/a/cybernoids.jp/cubism2/tools/texture
 　　name     : 【必須】Live2DモデルID(Live2Dmodel.jsで付けた名前)
 　　opacity  : 透明度(0.0～1.0)
 　　time     : 切り替え時間(1000=1秒)
+
+・Live2Dモデルのカラー
+ [live2d_color name="キャラ名"]
+　【パラメータ一覧】
+　　name     : 【必須】Live2DモデルID(Live2Dmodel.jsで付けた名前)
+　　red      : 赤(0.0～1.0)
+　　green    : 赤(0.0～1.0)
+　　blue     : 赤(0.0～1.0)
+
 
 ・Live2Dモデルの退場
  [live2d_delete name="キャラ名"]
@@ -238,6 +265,40 @@ live2dplugin
     │          │  │          Epsilon_free_m_sp_04.mtn
     │          │  │          Epsilon_free_m_sp_05.mtn
     │          │  │          Epsilon_free_shake_01.mtn
+    │          │  ├─Epsilon2.1
+    │          │  │  │  Epsilon2.1.moc
+    │          │  │  │  Epsilon2.1.model.json
+    │          │  │  │  Epsilon2.1.physics.json
+    │          │  │  │
+    │          │  │  ├─Epsilon2.1.2048
+    │          │  │  │      texture_00.png
+    │          │  │  │
+    │          │  │  ├─expressions
+    │          │  │  │      f01.exp.json
+    │          │  │  │      f02.exp.json
+    │          │  │  │      f03.exp.json
+    │          │  │  │      f04.exp.json
+    │          │  │  │      f05.exp.json
+    │          │  │  │      f06.exp.json
+    │          │  │  │      f07.exp.json
+    │          │  │  │      f08.exp.json
+    │          │  │  │
+    │          │  │  └─motions
+    │          │  │          Epsilon2.1_idle_01.mtn
+    │          │  │          Epsilon2.1_m_01.mtn
+    │          │  │          Epsilon2.1_m_02.mtn
+    │          │  │          Epsilon2.1_m_03.mtn
+    │          │  │          Epsilon2.1_m_04.mtn
+    │          │  │          Epsilon2.1_m_05.mtn
+    │          │  │          Epsilon2.1_m_06.mtn
+    │          │  │          Epsilon2.1_m_07.mtn
+    │          │  │          Epsilon2.1_m_08.mtn
+    │          │  │          Epsilon2.1_m_sp_01.mtn
+    │          │  │          Epsilon2.1_m_sp_02.mtn
+    │          │  │          Epsilon2.1_m_sp_03.mtn
+    │          │  │          Epsilon2.1_m_sp_04.mtn
+    │          │  │          Epsilon2.1_m_sp_05.mtn
+    │          │  │          Epsilon2.1_shake_01.mtn
     │          │  │
     │          │  └─haru
     │          │      │  haru.model.json

@@ -11,8 +11,8 @@ LIVE2D_MODEL['haru'] = {
     "modeljson":"haru.model.json"
 };
 
-// Live2Dモデル（Epsilon）
+// Live2Dモデル（Epsilon2.1）
 LIVE2D_MODEL['Epsilon'] = {
-    "filepath":"data/others/live2d/assets/Epsilon/",
-    "modeljson":"Epsilon_free.model.json"
+    "filepath":"data/others/live2d/assets/Epsilon2.1/",
+    "modeljson":"Epsilon2.1.model.json"
 };

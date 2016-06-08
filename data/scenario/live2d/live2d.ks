@@ -129,6 +129,27 @@ live2d_opacity(mp.name, mp.opacity, mp.time);
 
 
 ;------------------------------------------------------------
+; Live2Dキャラのカラー
+;------------------------------------------------------------
+[macro name = "live2d_color"]
+;*パラメータ1  : name         【必須】Live2DモデルID(一意なもの)
+;*パラメータ2  : red                 赤(0.0～1.0)
+;*パラメータ3  : green               緑(0.0～1.0)
+;*パラメータ4  : blue                青(0.0～1.0)
+[iscript]
+; optinal
+if(mp.name ==null)console.error('nameは必須です');
+if(mp.red == null)mp.red = 1.0;
+if(mp.green == null)mp.green = 1.0;
+if(mp.blue == null)mp.blue = 1.0;
+
+; Live2Dモデルのカラー[Live2Dtyrano.js]
+live2d_color(mp.name, mp.red, mp.green, mp.blue);
+[endscript]
+[endmacro]
+
+
+;------------------------------------------------------------
 ; Live2Dキャラの退場
 ;------------------------------------------------------------
 [macro name = "live2d_delete"]
