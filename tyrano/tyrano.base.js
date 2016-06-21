@@ -21,15 +21,13 @@ tyrano.base ={
     //画面サイズをぴったりさせます
     fitBaseSize:function(width,height){
       
-      var view_width = $.getViewPort().width;
+      	var view_width = $.getViewPort().width;
         var view_height = $.getViewPort().height;
         
         var width_f = view_width / width ;
         var height_f = view_height / height;
         
         var scale_f = 0;
-        
-        $(".tyrano_base").css("transform-origin","0 0");
         
         var space_width = 0;
         
@@ -43,14 +41,28 @@ tyrano.base ={
              }else{
                 scale_f = width_f;
         	}
-        	//alert(scale_f);
-        	$(".tyrano_base").css("transform","scale("+scale_f+") ");	
-        
+        	
+        	this.tyrano.kag.tmp.base_scale = scale_f;
+
+            setTimeout(function() {
+                
+                   $(".tyrano_base").css("transform", "scale(" + scale_f + ") ");
+                        if (parseInt(view_width) < parseInt(width)) {
+                            if (scale_f < 1) {
+                                window.scrollTo(width, height);
+                            }
+                        }
+
+            }, 100);        	
+            
         }else if(screen_ratio =="fit"){
             
             //スクリーンサイズに合わせて自動的に調整される
-            $(".tyrano_base").css("transform","scaleX("+width_f+") scaleY("+height_f+")");
-        
+            setTimeout(function() {
+                       $(".tyrano_base").css("transform","scaleX("+width_f+") scaleY("+height_f+")");
+                       window.scrollTo(width, height);
+            },100);
+            
         }else{
         	
         	//スクリーンサイズ固定
