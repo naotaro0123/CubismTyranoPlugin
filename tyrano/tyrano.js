@@ -26,7 +26,7 @@ tyrano.core ={
     },
     
     status:{
-        loaded_plugin:0,
+        loaded_plugin:0
     },
     
     array_plugins:["kag"], //ロードするプラグイン一覧
@@ -165,35 +165,6 @@ tyrano.core ={
         //alert("tyrano test");
     }
 };
-
-
-
-if (AC_FL_RunContent == 0) {
-    alert("このページでは \"AC_RunActiveContent.js\" が必要です。");
-} else {
-    AC_FL_RunContent(
-        'codebase', 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=9,0,0,0',
-        'width', '1',
-        'height', '1',
-        'src', 'novel_sound',
-        'quality', 'high',
-        'pluginspage', 'http://www.macromedia.com/go/getflashplayer',
-        'align', 'middle',
-        'play', 'true',
-        'loop', 'true',
-        'scale', 'showall',
-        'wmode', 'window',
-        'devicefont', 'false',
-        'id', 'externalnovelsound',
-        'bgcolor', '#ffffff',
-        'name', 'externalnovelsound',
-        'menu', 'true',
-        'allowFullScreen', 'false',
-        'allowScriptAccess','always',
-        'movie', 'novel_sound',
-        'salign', ''
-        ); //end AC code
-}
 
 
 

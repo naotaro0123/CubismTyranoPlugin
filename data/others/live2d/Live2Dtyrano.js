@@ -1,5 +1,5 @@
 var Live2Dcanvas = [];      // canvas
-
+var Live2Dglno = 0;         // glContextのno
 var v_prefix = "";
 
 var browser=$.getBrowser();
@@ -27,7 +27,8 @@ if(browser == "chrome" || browser == "safari"){
                                   modelpath  /*Live2Dモデルパス定義*/,
                                   pointX     /*Live2Dモデルの表示位置X*/,
                                   pointY     /*Live2Dモデルの表示位置Y*/,
-                                  modelscale /*Live2Dモデルの表示サイズ*/
+                                  modelscale /*Live2Dモデルの表示サイズ*/,
+                                  modelno    /*ModelNo*/
                                  ) {
         // optional
         if(pointX == null)pointX = 0.0;
@@ -92,6 +93,7 @@ if(browser == "chrome" || browser == "safari"){
         
         this.check_delete = 0; //0:再生 1:一時停止 2: 削除
 
+        this.modelno = modelno; // modelNo。gl管理用
 
         // canvasオブジェクトを取得
         this.canvas = document.getElementById(canvasid);
@@ -137,8 +139,10 @@ if(browser == "chrome" || browser == "safari"){
         var that = this;
         // mocファイルからLive2Dモデルのインスタンスを生成
         that.loadBytes(that.filepath + that.modelDef.model, function(buf){
+            // OpenGLのコンテキストをセット
+            Live2D.setGL(gl, that.modelno);
             // Live2Dモデルのロードと初期化
-            that.live2DModel = Live2DModelWebGL.loadModel(buf);
+            that.live2DModel = Live2DModelWebGL.loadModel(buf, that.modelno);
         });
         // テクスチャの読み込み
         var loadCount = 0;
@@ -293,8 +297,6 @@ if(browser == "chrome" || browser == "safari"){
             }
             // テクスチャの元画像の参照をクリア
             that.loadedImages = null;
-            // OpenGLのコンテキストをセット
-            that.live2DModel.setGL(gl);
             // 表示位置を指定するための行列を定義する
             var s = that.modelscale / that.live2DModel.getCanvasWidth();
             var matrix4x4 = [
@@ -312,7 +314,6 @@ if(browser == "chrome" || browser == "safari"){
 
         // アイドルモーション以外の場合（フラグで判定する）
         if(that.motionflg == true){
-            console.log("モーション");
             // 優先度高めでモーション再生
             that.setMotion(that, that.motionnm, 1);
             // フラグは落としておく
@@ -321,7 +322,6 @@ if(browser == "chrome" || browser == "safari"){
 
         // モーションが終了していたらアイドルモーションの再生
         if(that.motionMgr.isFinished() && that.idlemotion != null){
-            console.log("アイドル");
             // 優先度低めでアイドルモーション再生
             that.setMotion(that, that.idlemotion, 0);
         }
@@ -437,7 +437,10 @@ if(browser == "chrome" || browser == "safari"){
             return -1;
         }
 
-        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+        if(this.live2DModel.isPremultipliedAlpha() == false){
+            // 乗算済アルファテクスチャ以外の場合
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+        }
         // imageを上下反転
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
         // テクスチャのユニットを指定する
@@ -526,13 +529,13 @@ if(browser == "chrome" || browser == "safari"){
     * キャラクターの回転
     */
     Live2Dtyrano.prototype.rotateChange= function(  model_id,
-    												deg  /*Canvasの回転角度*/,
-                                                    time /*アニメーション時間*/){
+                                                     deg  /*Canvasの回転角度*/,
+                                                     time /*アニメーション時間*/){
         // optional
         if(deg == null){
             this.degs = 0;
         }else{
-            this.degs += deg;
+            this.degs += parseInt(deg);
         }
         if(time == null) time = "2.0s";
         this.rotate = "rotate(" + this.degs + "deg)";
@@ -602,6 +605,20 @@ if(browser == "chrome" || browser == "safari"){
        
     };
 
+    /**
+     * キャラクターのカラー
+     */
+    Live2Dtyrano.prototype.colorChange = function( r  /*Rカラー*/,
+                                                    g  /*Gカラー*/,
+                                                    b  /*Bカラー*/){
+        // optional
+        if(r == null) r = 1.0;
+        if(g == null) g = 1.0;
+        if(b == null) b = 1.0;
+        // 引数は(alpha, red, green, blue)
+        this.live2DModel.drawParamWebGL.setBaseColor(1.0, r, g, b);
+
+    };
 
 
     /****************************************
@@ -635,7 +652,7 @@ if(browser == "chrome" || browser == "safari"){
 
 
 //----------------------------------------------------------------------//
-//                     上記クラスを操作するファンクション                      //
+//                     上記クラスを操作するファンクション               //
 //----------------------------------------------------------------------//
 /**
 * ファイルロードとLive2Dモデル生成
@@ -779,10 +796,10 @@ function _live2d_create( model_id      /*Live2DモデルID*/,
     
 
     TYRANO.kag.stat.f.live2d_models[model_id] = live2d_model;
-    Live2Dcanvas[model_id] = new Live2Dtyrano(eleid, filepath, jsondata, gl_left, gl_top, gl_scale);
+    Live2Dcanvas[model_id] = new Live2Dtyrano(eleid, filepath, jsondata, gl_left, gl_top, gl_scale, Live2Dglno);
     Live2Dcanvas[model_id].alphaChange(can_opacity);
     Live2Dcanvas[model_id].visible = can_visible;
-    
+    Live2Dglno++;
     
 }
 
@@ -806,6 +823,7 @@ function live2d_show( model_id   /*Live2DモデルID*/,
     }
 
     Live2Dcanvas[model_id].scaleChange(scale,scale,"0");
+    Live2Dcanvas[model_id].rotateChange(model_id);
 
     //$("#Live2D_"+model_id).css({"left":200,"top":top});
 
@@ -864,6 +882,21 @@ function live2d_opacity( model_id   /*Live2DモデルID*/,
     setTimeout("Live2Dcanvas['" + model_id + "'].alphaChange(" + opacity + ");", time);
     TYRANO.kag.stat.f.live2d_models[model_id]["opacity"] = opacity;
     
+}
+
+/**
+ * Live2Dキャラのカラー
+ */
+function live2d_color( model_id   /*Live2DモデルID*/,
+                        red        /*Rカラー*/,
+                        green      /*Gカラー*/,
+                        blue       /*Bカラー*/){
+    // キャラを透明にしていく
+    Live2Dcanvas[model_id].colorChange(red, green, blue);
+    TYRANO.kag.stat.f.live2d_models[model_id]["color_red"]   = red;
+    TYRANO.kag.stat.f.live2d_models[model_id]["color_green"] = green;
+    TYRANO.kag.stat.f.live2d_models[model_id]["color_blue"]  = blue;
+
 }
 
 /**
