@@ -5,11 +5,6 @@
 ;
 ;
 
-[call storage="live2d/live2d.ks"]
-
-;live2d復元
-[live2d_restore]
-
 ;make.ks はロード時にcallとして呼ばれるため、return必須です。
 [return]
 
