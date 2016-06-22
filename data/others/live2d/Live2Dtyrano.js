@@ -496,8 +496,9 @@ if(browser == "chrome" || browser == "safari"){
         if(idle != ''){
             this.idlemotion = cnt;
             //モーションを保存する
-            TYRANO.kag.stat.f.live2d_models[model_id]["motion"] = mtnfilenm;
-    
+            if(TYRANO){
+                TYRANO.kag.stat.f.live2d_models[model_id]["motion"] = mtnfilenm;
+            }
         }
         this.motionflg = true;
     };
