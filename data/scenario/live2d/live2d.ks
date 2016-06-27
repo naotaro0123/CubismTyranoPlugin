@@ -46,9 +46,18 @@ if(mp.glleft == null)mp.glleft = 0.0;
 if(mp.gltop == null)mp.gltop = 0.0;
 if(mp.glscale == null)mp.glscale = 1.0;
 
+
 ; Live2DのCanvas追加する親ID
 parentID = 'tyrano_base';
 ; Canvasを生成し、Live2Dモデルを透明で表示[Live2Dtyrano.js]
+
+TG.stat.is_strong_stop = true;
+var complete_event = function(){
+	TG.stat.is_strong_stop = false;
+	TG.layer.showEventLayer();
+	TG.ftag.nextOrder();
+};
+
 live2d_new(
     LIVE2D_MODEL[mp.name],
     mp.name,
@@ -62,7 +71,8 @@ live2d_new(
     Number(mp.glleft),
     Number(mp.gltop),
     Number(mp.glscale),
-    parentID);
+    parentID,
+    complete_event);
 [endscript]
 [endmacro]
 
@@ -81,13 +91,21 @@ live2d_new(
 [iscript]
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
-if(mp.time == null)mp.time = 100;
+if(mp.time == null)mp.time = 1000;
 if(mp.left == null)mp.left = 0;
 if(mp.top == null)mp.top = 0;
 if(mp.scale == null)mp.scale = 1;
 
+TG.stat.is_strong_stop = true;
+var complete_event = function(){
+	TG.stat.is_strong_stop = false;
+	TG.layer.showEventLayer();
+	TG.ftag.nextOrder();
+};
+
+
 ; Live2Dモデルの表示[Live2Dtyrano.js]
-live2d_show(mp.name, mp.time,mp.left,mp.top,mp.scale);
+live2d_show(mp.name, mp.time,mp.left,mp.top,mp.scale,complete_event);
 [endscript]
 [endmacro]
 
@@ -101,10 +119,17 @@ live2d_show(mp.name, mp.time,mp.left,mp.top,mp.scale);
 [iscript]
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
-if(mp.time == null)mp.time = 100;
+if(mp.time == null)mp.time = 1000;
+
+TG.stat.is_strong_stop = true;
+var complete_event = function(){
+	TG.stat.is_strong_stop = false;
+	TG.layer.showEventLayer();
+	TG.ftag.nextOrder();
+};
 
 ; Live2Dモデルの非表示[Live2Dtyrano.js]
-live2d_hide(mp.name, mp.time);
+live2d_hide(mp.name, mp.time,complete_event);
 [endscript]
 [endmacro]
 
@@ -120,7 +145,7 @@ live2d_hide(mp.name, mp.time);
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
 if(mp.opacity ==null)console.error('opacityは必須です');
-if(mp.time == null)mp.time = 100;
+if(mp.time == null)mp.time = 1000;
 
 ; Live2Dモデルの透明度[Live2Dtyrano.js]
 live2d_opacity(mp.name, mp.opacity, mp.time);
@@ -198,7 +223,7 @@ Live2Dcanvas[mp.name].motionChange(mp.name, mp.filenm, mp.idle);
 if(mp.name ==null)console.error('nameは必須です');
 if(mp.left ==null)console.error('leftは必須です');
 if(mp.top ==null)console.error('topは必須です');
-if(mp.time == null)mp.time = 100;
+if(mp.time == null)mp.time = 1000;
 ; Live2Dモデルの移動[Live2Dtyrano.js]
 Live2Dcanvas[mp.name].transChange(mp.name,mp.left, mp.top, mp.time);
 [endscript]
@@ -216,7 +241,7 @@ Live2Dcanvas[mp.name].transChange(mp.name,mp.left, mp.top, mp.time);
 ; optinal
 if(mp.name ==null)console.error('nameは必須です');
 if(mp.rotate ==null)console.error('rotateは必須です');
-if(mp.time == null)mp.time = 100;
+if(mp.time == null)mp.time = 1000;
 ; Live2Dモデルの回転[Live2Dtyrano.js]
 Live2Dcanvas[mp.name].rotateChange(mp.name,mp.rotate, mp.time);
 [endscript]
@@ -236,7 +261,7 @@ Live2Dcanvas[mp.name].rotateChange(mp.name,mp.rotate, mp.time);
 if(mp.name ==null)console.error('nameは必須です');
 if(mp.scaleX ==null)console.error('scaleXは必須です');
 if(mp.scaleY ==null)console.error('scaleYは必須です');
-if(mp.time == null)mp.time = 100;
+if(mp.time == null)mp.time = 1000;
 ; Live2Dモデルの移動[Live2Dtyrano.js]
 Live2Dcanvas[mp.name].scaleChange(mp.scaleX, mp.scaleY, mp.time);
 [endscript]
