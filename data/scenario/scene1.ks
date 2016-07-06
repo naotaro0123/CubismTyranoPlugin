@@ -42,7 +42,6 @@
 Live2Dを使う事で今までにないアニメーションを[r]する事ができます[p]
 このサンプルではLive2Dの使い方を紹介するね[p]
 
-
 最初にちょっと移動してみるね[p]
 [live2d_trans name="haru" left=200 top=0]
 [wait time=1500]
@@ -82,6 +81,23 @@ Live2Dを使う事で今までにないアニメーションを[r]する事が�
 [live2d_motion name="haru" filenm="tapBody_02.mtn"]
 [wait time=3000]
 [live2d_motion name="haru" filenm="idle_00.mtn" idle="ON"]
+
+
+表情モーションも再生できるよ[p]
+[live2d_expression name="haru" filenm="f03"]
+怒ったり、
+[wait time=1500]
+[live2d_expression name="haru" filenm="f04"]
+困ったり、
+[wait time=1500]
+[live2d_expression name="haru" filenm="f06"]
+びっくりしたり、
+[wait time=1500]
+[live2d_expression name="haru" filenm="f07"]
+色々なギャルゲが作れますね♪[p]
+[wait time=1500]
+;表情をデフォルトに戻す
+[live2d_expression name="haru" filenm="f01"]
 
 
 あとキャラクターの色も変えられるよ[p]

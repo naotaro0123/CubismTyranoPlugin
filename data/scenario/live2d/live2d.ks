@@ -186,6 +186,23 @@ Live2Dcanvas[mp.name].motionChange(mp.name, mp.filenm, mp.idle);
 
 
 ;------------------------------------------------------------
+; Live2Dキャラの表情モーション再生
+;------------------------------------------------------------
+[macro name = "live2d_expression"]
+;*パラメータ1  : name         【必須】Live2DモデルID(一意なもの)
+;*パラメータ2  : filenm              Live2D表情モーションファイル名
+[iscript]
+; optinal
+if(mp.name ==null)console.error('nameは必須です');
+;表情モーション名を指定しない場合、モーションストップ
+if(mp.filenm == null)mp.filenm = '';
+; Live2Dモデルのモーション再生[Live2Dtyrano.js]
+Live2Dcanvas[mp.name].expressionChange(mp.name, mp.filenm);
+[endscript]
+[endmacro]
+
+
+;------------------------------------------------------------
 ; Live2Dキャラの移動
 ;------------------------------------------------------------
 [macro name = "live2d_trans"]
