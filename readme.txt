@@ -1,6 +1,6 @@
 CONFIDENTIAL
 ============================================================
-	Live2D x TYRANOSCRIPTプラグイン v2.00
+	Live2D x TYRANOSCRIPTプラグイン v2.0.01
 	(c) Live2D Inc.
 ============================================================
 ティラノスクリプト上でLive2Dを動かすプラグインです。
@@ -31,7 +31,10 @@ data/others/live2d/lib配下にlibe2d.min.jsを置いて下さい。
 ----------------------------------------
 	リリースノート
 ----------------------------------------
-	2.0.00(2015/06/21)
+	2.0.01(2016/07/06)
+		表情モーション再生タグを追加
+
+	2.0.00(2016/06/21)
 		Cubism SDK 2.1対応
 		回転が動作しないバグを修正
 		キャラクターのカラー変更を追加
@@ -168,7 +171,6 @@ https://sites.google.com/a/cybernoids.jp/cubism2/tools/texture
 　　green    : 赤(0.0～1.0)
 　　blue     : 赤(0.0～1.0)
 
-
 ・Live2Dモデルの退場
  [live2d_delete name="キャラ名"]
 　【パラメータ一覧】
@@ -180,6 +182,12 @@ https://sites.google.com/a/cybernoids.jp/cubism2/tools/texture
 　　name     : 【必須】Live2DモデルID(Live2Dmodel.jsで付けた名前)
 　　filenm   : モーション番号(モーションファイル名)
 　　idle     : アイドリング有無('ON'など文字列を渡すとアイドリングさせます)
+
+・Live2Dモデルの表情モーション再生
+ [live2d_expression name="キャラ名"]
+　【パラメータ一覧】
+　　name     : 【必須】Live2DモデルID(Live2Dmodel.jsで付けた名前)
+　　filenm   : 表情モーションファイル名(model.jsonのexpressionsにあるname)
 
 ・Live2Dモデルの移動
  [live2d_trans name="キャラ名"]
