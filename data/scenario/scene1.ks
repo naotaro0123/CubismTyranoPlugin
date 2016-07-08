@@ -94,7 +94,7 @@ Live2Dを使う事で今までにないアニメーションを[r]する事が�
 びっくりしたり、
 [wait time=1500]
 [live2d_expression name="haru" filenm="f07"]
-色々なギャルゲが作れますね♪[p]
+表情豊かなキャラクターを表現できますね♪[p]
 [wait time=1500]
 ;表情をデフォルトに戻す
 [live2d_expression name="haru" filenm="f01"]

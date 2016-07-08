@@ -344,6 +344,14 @@ tf.cnt_model = tf.array_models.length;
 		tf.model_motion = "";
 	}
 	
+	//表情指定
+	if(tf.array_models[tf.i]["expression"]){
+		tf.model_expression = tf.array_models[tf.i]["expression"];
+	}else{
+		tf.model_expression = "";
+	}
+	
+	
 	if(tf.array_models[tf.i]["rotate"]){
 		tf.model_rotate = tf.array_models[tf.i]["rotate"];
 	}else{
@@ -368,6 +376,9 @@ tf.cnt_model = tf.array_models.length;
 @live2d_motion name=&tf.model_name filenm=&tf.model_motion idle="ON" 
 [endif]
 
+[if exp="tf.model_expression!=''"]
+@live2d_expression name=&tf.model_name filenm=&tf.model_expression 
+[endif]
 
 [if exp="tf.i<tf.cnt_model"]
 @jump target="point"
