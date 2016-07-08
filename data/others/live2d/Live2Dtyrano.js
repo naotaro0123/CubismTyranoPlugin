@@ -68,6 +68,14 @@ if(browser == "chrome" || browser == "safari"){
         this.soundnum = 0;
         // 前に流したサウンド
         this.beforesound = 0;
+        // 表情モーション
+        this.expressions = [];
+        // 表情モーション管理マネジャー
+        this.expressionManager = null;
+        // 表情モーションフラグ
+        this.expressionflg = false;
+        // 表情モーション番号
+        this.expressionnm = 0;
         // Canvasパラメーター
         this.trans = '';    // 移動位置
         this.transX = 0;    // 揺らす用
@@ -166,6 +174,12 @@ if(browser == "chrome" || browser == "safari"){
 
         // モーションマネージャクラスの生成
         that.motionMgr = new L2DMotionManager();
+
+        // 表情モーションロード処理
+        that.loadExpressions(that);
+        
+        // 表情モーションマネージャーのインスタンス化
+        that.expressionManager = new L2DMotionManager();
 
         // ポーズのロード(json内にposeがあるかチェック)
         if(that.modelDef.pose !== void 0){
@@ -274,6 +288,26 @@ if(browser == "chrome" || browser == "safari"){
 
 
     /**
+    * 表情モーションのロード
+    */
+    Live2Dtyrano.prototype.loadExpressions = function(that/*this代入した変数*/){
+        var expression_name = [];   // 表情モーション名の配列
+        var expression_file = [];   // 表情モーションファイル名の配列
+
+        // 表情のロード(json内にexpressionsがあるかチェック)
+        if(that.modelDef.expressions !== void 0){
+            for(var i = 0; i < that.modelDef.expressions.length; i++){
+                // 表情モーション名の配列を取得
+                expression_name[i] = that.modelDef.expressions[i].name;
+                expression_file[i] = that.filepath + that.modelDef.expressions[i].file;
+                // 表情ファイルをロード
+                that.loadExpression(expression_name[i], expression_file[i]);
+            }
+        }
+    };
+
+
+    /**
     * Live2Dの描画処理
     */
     Live2Dtyrano.prototype.draw = function( gl  /*WebGLコンテキスト*/,
@@ -329,6 +363,14 @@ if(browser == "chrome" || browser == "safari"){
         if(that.idlemotion != null || that.motionnm != null){
             // モーションパラメータの更新
             that.motionMgr.updateParam(that.live2DModel);
+        }
+
+        // 表情でパラメータ更新（相対変化）
+        if(that.expressionManager != null &&
+           that.expressions != null &&
+           !that.expressionManager.isFinished())
+        {
+            that.expressionManager.updateParam(that.live2DModel);
         }
 
         // ポーズパラメータの更新
@@ -478,10 +520,39 @@ if(browser == "chrome" || browser == "safari"){
 
 
     /**
+     * 表情をロードする
+     */
+    Live2Dtyrano.prototype.loadExpression = function(name, path){
+        var thisRef = this;
+        this.loadBytes(path, function(buf) {
+            if(name != null) {
+                thisRef.expressions[name] = L2DExpressionMotion.loadJson(buf);
+            }
+        });
+    };
+
+
+    /**
+     * 表情モーションを切り替える
+     */
+    Live2Dtyrano.prototype.expressionChange = function(model_id/*モデルID*/,
+                                                         expressionnm /*表情モーション名*/)
+    {
+        var expression_motion = this.expressions[expressionnm];
+        this.expressionManager.startMotion(expression_motion, false);
+        //表情モーションを保存する
+        if(TYRANO){
+            TYRANO.kag.stat.f.live2d_models[model_id]["expression"] = expressionnm;
+        }
+    }
+
+
+    /**
     * モーション切り替え
     */
-    Live2Dtyrano.prototype.motionChange = function(model_id,mtnfilenm/*モーションファイル名*/,
-                                                    idle/*アイドリング有無*/){
+    Live2Dtyrano.prototype.motionChange = function(model_id/*モデルID*/,
+                                                     mtnfilenm/*モーションファイル名*/,
+                                                     idle/*アイドリング有無*/){
         var cnt = 0;
         // ファイル名からファイル番号を取り出す
         for(var k = 0; k < this.motionfilesnm.length; k++){
@@ -730,10 +801,11 @@ function live2d_new( model_def      /*Live2Dモデル定義*/,
         "can_visible":can_visible, /*Canvasの表示制御*/
         "gl_left":gl_left,         /*Canvas内のLive2DモデルのX位置*/
         "gl_top":gl_top,           /*Canvas内のLive2DモデルのY位置*/
-        "scale":1,  //スケール情報。chara_newの時は1でおｋ
+        "scale":1,                 /*スケール情報。chara_newの時は1でおｋ*/
         "gl_scale":gl_scale,       /*Canvas内のLive2Dモデルのスケール*/
         "paraent_id":paraent_id,
-        "motion":"" //モーション
+        "motion":"",               /*モーション*/
+        "expression":""            /*表情モーション*/
     };
 
     // model.jsonをロードする
