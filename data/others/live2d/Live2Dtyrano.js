@@ -1012,6 +1012,7 @@ function live2d_delete(model_id     /*Live2DモデルID*/,
 */
 function live2d_Canvas_delete(model_id      /*Live2Dモデル名*/,
                                paraent_id    /*親ID*/){
+    Live2D.deleteBuffer(Live2Dcanvas[model_id].modelno);
     $("#Live2D_"+model_id).remove();
     Live2Dcanvas[model_id] = null;
 }
