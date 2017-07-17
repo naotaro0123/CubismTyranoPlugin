@@ -12,6 +12,8 @@ if(browser == "chrome" || browser == "safari"){
     v_prefix = "Moz";
 }else if(browser =="opera"){
     v_prefix = "o";
+}else{
+    v_prefix = "webkit";
 }
 
 (function(window){
