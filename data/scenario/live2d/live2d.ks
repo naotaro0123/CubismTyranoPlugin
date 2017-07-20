@@ -313,14 +313,18 @@ tf.models = live2d_models;
 tf.array_models = [];
 var index=0;
 for (var name in live2d_models){
-	live2d_models[name]["name"] = name;
-    tf.array_models[index] = live2d_models[name];
-    index++;
+	if(live2d_models[name]){
+	    live2d_models[name]["name"] = name;
+        tf.array_models[index] = live2d_models[name];
+        index++;
+    }
 }
 
 tf.cnt_model = tf.array_models.length;
 
 [endscript]
+
+@jump target="*end" cond="tf.cnt_model==0"
 
 *point
 
@@ -383,5 +387,7 @@ tf.cnt_model = tf.array_models.length;
 [if exp="tf.i<tf.cnt_model"]
 @jump target="point"
 [endif]
+
+*end
 
 [endmacro]
