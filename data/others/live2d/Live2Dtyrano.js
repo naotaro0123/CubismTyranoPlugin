@@ -456,7 +456,8 @@ if(browser == "chrome" || browser == "safari"){
         var NAMES = [ "webgl" , "experimental-webgl" , "webkit-3d" , "moz-webgl"];
         var param = {
             alpha : true,
-            premultipliedAlpha : true
+            premultipliedAlpha : true,
+            preserveDrawingBuffer:true
         };
 
         for( var i = 0; i < NAMES.length; i++ ){
