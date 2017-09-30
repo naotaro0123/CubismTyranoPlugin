@@ -7,7 +7,8 @@
 @call storage="tyrano.ks"
 
 ;live2dプラグインを読込
-@call storage="live2d/live2d.ks"
+;@call storage="live2d/v2.1/live2d.ks"
+@call storage="live2d/v3.0/live2d.ks"
 
 ;ゲームで必ず必要な初期化処理はこのファイルに記述するのがオススメ
 
@@ -18,6 +19,7 @@
 [hidemenubutton]
 
 ;タイトル画面へ移動
-@jump storage="title.ks"
+;@jump storage="title_v2.1.ks"
+@jump storage="title_v3.0.ks"
 
 [s]

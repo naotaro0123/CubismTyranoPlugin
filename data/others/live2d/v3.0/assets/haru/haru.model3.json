@@ -1,0 +1,17 @@
+{
+    "Version": 3,
+    "FileReferences": {
+        "Moc": "haru.moc3",
+        "Textures": [
+            "haru.1024/texture_00.png",
+            "haru.1024/texture_01.png",
+            "haru.1024/texture_02.png"
+        ],
+        "Motions": [
+            "motions/haru_m_01.motion3.json",
+            "motions/haru_m_02.motion3.json",
+            "motions/haru_m_03.motion3.json"
+        ],
+        "Physics": "Physics.physics3.json"
+    }
+}

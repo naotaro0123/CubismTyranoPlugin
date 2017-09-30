@@ -2,12 +2,12 @@
 ; Live2D x tyranoscript対応マクロ
 ;============================================================
 ; ライブラリ読込
-[loadjs storage = "live2d/lib/live2d.min.js"]
-[loadjs storage = "live2d/framework/Live2DFramework.js"]
-[loadjs storage = "live2d/framework/PlatformManager.js"]
-[loadjs storage = "live2d/framework/LAppLive2DManager.js"]
-[loadjs storage = "live2d/Live2Dmodel.js"]
-[loadjs storage = "live2d/Live2Dtyrano.js"]
+[loadjs storage = "live2d/v3.0/lib/pixi.min.js"]
+[loadjs storage = "live2d/v3.0/lib/live2dcubismcore.min.js"]
+[loadjs storage = "live2d/v3.0/framework/live2dcubismframework.js"]
+[loadjs storage = "live2d/v3.0/framework/live2dcubismpixi.js"]
+[loadjs storage = "live2d/v3.0/Live2Dmodel.js"]
+[loadjs storage = "live2d/v3.0/Live2Dtyrano.js"]
 
 [iscript]
 ;live2Dが初めての場合、初期化する
@@ -53,26 +53,28 @@ parentID = 'tyrano_base';
 
 TG.stat.is_strong_stop = true;
 var complete_event = function(){
-	TG.stat.is_strong_stop = false;
-	TG.layer.showEventLayer();
-	TG.ftag.nextOrder();
+    TG.stat.is_strong_stop = false;
+    TG.layer.showEventLayer();
+    TG.ftag.nextOrder();
 };
 
-live2d_new(
-    LIVE2D_MODEL[mp.name],
-    mp.name,
-    mp.left,
-    mp.top,
-    mp.width,
-    mp.height,
-    mp.zindex,
-    mp.opacity,
-    mp.can_visible,
-    Number(mp.glleft),
-    Number(mp.gltop),
-    Number(mp.glscale),
-    parentID,
-    complete_event);
+live2d_new(mp.name);
+
+;live2d_new(
+;    LIVE2D_MODEL[mp.name],
+;    mp.name,
+;    mp.left,
+;    mp.top,
+;    mp.width,
+;    mp.height,
+;    mp.zindex,
+;    mp.opacity,
+;    mp.can_visible,
+;    Number(mp.glleft),
+;    Number(mp.gltop),
+;    Number(mp.glscale),
+;    parentID,
+;    complete_event);
 [endscript]
 [endmacro]
 
@@ -98,9 +100,9 @@ if(mp.scale == null)mp.scale = 1;
 
 TG.stat.is_strong_stop = true;
 var complete_event = function(){
-	TG.stat.is_strong_stop = false;
-	TG.layer.showEventLayer();
-	TG.ftag.nextOrder();
+    TG.stat.is_strong_stop = false;
+    TG.layer.showEventLayer();
+    TG.ftag.nextOrder();
 };
 
 
@@ -123,9 +125,9 @@ if(mp.time == null)mp.time = 1000;
 
 TG.stat.is_strong_stop = true;
 var complete_event = function(){
-	TG.stat.is_strong_stop = false;
-	TG.layer.showEventLayer();
-	TG.ftag.nextOrder();
+    TG.stat.is_strong_stop = false;
+    TG.layer.showEventLayer();
+    TG.ftag.nextOrder();
 };
 
 ; Live2Dモデルの非表示[Live2Dtyrano.js]
@@ -313,8 +315,8 @@ tf.models = live2d_models;
 tf.array_models = [];
 var index=0;
 for (var name in live2d_models){
-	if(live2d_models[name]){
-	    live2d_models[name]["name"] = name;
+    if(live2d_models[name]){
+        live2d_models[name]["name"] = name;
         tf.array_models[index] = live2d_models[name];
         index++;
     }
@@ -329,41 +331,41 @@ tf.cnt_model = tf.array_models.length;
 *point
 
 [iscript]
-	
-	tf.model_name=tf.array_models[tf.i]["name"];
-	tf.model_left=tf.array_models[tf.i]["can_left"];
-	tf.model_top = tf.array_models[tf.i]["can_top"];
-	
-	tf.model_glscale = tf.array_models[tf.i]["gl_scale"];
-	tf.model_scale = tf.array_models[tf.i]["scale"];
-	
-	tf.model_visible = tf.array_models[tf.i]["can_visible"];
-	tf.model_width  = tf.array_models[tf.i]["can_width"];
-	tf.model_height = tf.array_models[tf.i]["can_height"];
-	
-	//モーションはアイドル指定の場合のみ
-	if(tf.array_models[tf.i]["motion"]){
-		tf.model_motion = tf.array_models[tf.i]["motion"];
-	}else{
-		tf.model_motion = "";
-	}
-	
-	//表情指定
-	if(tf.array_models[tf.i]["expression"]){
-		tf.model_expression = tf.array_models[tf.i]["expression"];
-	}else{
-		tf.model_expression = "";
-	}
-	
-	
-	if(tf.array_models[tf.i]["rotate"]){
-		tf.model_rotate = tf.array_models[tf.i]["rotate"];
-	}else{
-		tf.model_rotate = 0;
-	}
-	
-	tf.i++;
-	
+
+    tf.model_name=tf.array_models[tf.i]["name"];
+    tf.model_left=tf.array_models[tf.i]["can_left"];
+    tf.model_top = tf.array_models[tf.i]["can_top"];
+
+    tf.model_glscale = tf.array_models[tf.i]["gl_scale"];
+    tf.model_scale = tf.array_models[tf.i]["scale"];
+
+    tf.model_visible = tf.array_models[tf.i]["can_visible"];
+    tf.model_width  = tf.array_models[tf.i]["can_width"];
+    tf.model_height = tf.array_models[tf.i]["can_height"];
+
+    //モーションはアイドル指定の場合のみ
+    if(tf.array_models[tf.i]["motion"]){
+        tf.model_motion = tf.array_models[tf.i]["motion"];
+    }else{
+        tf.model_motion = "";
+    }
+
+    //表情指定
+    if(tf.array_models[tf.i]["expression"]){
+        tf.model_expression = tf.array_models[tf.i]["expression"];
+    }else{
+        tf.model_expression = "";
+    }
+
+
+    if(tf.array_models[tf.i]["rotate"]){
+        tf.model_rotate = tf.array_models[tf.i]["rotate"];
+    }else{
+        tf.model_rotate = 0;
+    }
+
+    tf.i++;
+
 [endscript]
 
 @live2d_new name=&tf.model_name width=&tf.model_width height=&tf.model_height glscale=&tf.model_glscale
@@ -373,15 +375,15 @@ tf.cnt_model = tf.array_models.length;
 [endif]
 
 [if exp="tf.model_visible==true"]
-@live2d_show name=&tf.model_name left=&tf.model_left top=&tf.model_top scale=&tf.model_scale 
+@live2d_show name=&tf.model_name left=&tf.model_left top=&tf.model_top scale=&tf.model_scale
 [endif]
 
 [if exp="tf.model_motion!=''"]
-@live2d_motion name=&tf.model_name filenm=&tf.model_motion idle="ON" 
+@live2d_motion name=&tf.model_name filenm=&tf.model_motion idle="ON"
 [endif]
 
 [if exp="tf.model_expression!=''"]
-@live2d_expression name=&tf.model_name filenm=&tf.model_expression 
+@live2d_expression name=&tf.model_name filenm=&tf.model_expression
 [endif]
 
 [if exp="tf.i<tf.cnt_model"]

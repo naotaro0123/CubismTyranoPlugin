@@ -7,12 +7,12 @@ var LIVE2D_MODEL = [];
 
 // Live2Dモデル（haru）
 LIVE2D_MODEL['haru'] = {
-    "filepath":"data/others/live2d/assets/haru/",
-    "modeljson":"haru.model.json"
+    "filepath": "data/others/live2d/v2.1/assets/haru/",
+    "modeljson": "haru.model.json"
 };
 
 // Live2Dモデル（Epsilon2.1）
 LIVE2D_MODEL['Epsilon'] = {
-    "filepath":"data/others/live2d/assets/Epsilon2.1/",
-    "modeljson":"Epsilon2.1.model.json"
+    "filepath": "data/others/live2d/v2.1/assets/Epsilon2.1/",
+    "modeljson": "Epsilon2.1.model.json"
 };
