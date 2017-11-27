@@ -1,7 +1,7 @@
 // Canvas
 const CANVAS_INFO : any = {
     "id" : "Live2D_",
-    "name" : "koharu",
+    "name" : "unitychan",
     "width" : 500,
     "height" : 500,
     "x" : 250,
@@ -94,6 +94,7 @@ class Live2Dtyrano{
         this._model = this._modelbuilder.build();
         // Add model to stage.
         this._app.stage.addChild(this._model);
+        this._app.stage.addChild(this._model.masks);
     }
     loadAnimations(_resources : PIXI.loaders.ResourceDictionary){
         // Load animation.
@@ -120,6 +121,7 @@ class Live2Dtyrano{
         // Set up ticker.
         this._app.ticker.add((deltaTime) => {
             this._model.update(deltaTime);
+            this._model.masks.update(this._app.renderer);
         });
     }
     setTickSpeed(speed : number = 1){
@@ -140,6 +142,8 @@ class Live2Dtyrano{
         this._model.position = new PIXI.Point(CANVAS_INFO.x, CANVAS_INFO.y);
         // model.scale = new PIXI.Point((model.position.x * 0.8), (model.position.x * 0.8));
         this._model.scale = new PIXI.Point(CANVAS_INFO.scaleX, CANVAS_INFO.scaleY);
+        // Resize mask texture.
+        this._model.masks.resize(this._app.view.width, this._app.view.height);
     }
     destroy(){
         this.stopAnimation();

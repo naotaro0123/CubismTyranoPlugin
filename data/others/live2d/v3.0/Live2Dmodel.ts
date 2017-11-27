@@ -15,3 +15,8 @@ LIVE2D_MODEL['koharu'] = {
     "filepath": "data/others/live2d/v3.0/assets/koharu/",
     "modeljson": "koharu.model3.json"
 };
+// Live2Dモデル（unitychan）
+LIVE2D_MODEL['unitychan'] = {
+    "filepath": "data/others/live2d/v3.0/assets/unitychan/",
+    "modeljson": "unitychan.model3.json"
+};
