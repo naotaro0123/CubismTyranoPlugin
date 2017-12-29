@@ -1,6 +1,6 @@
 // プリロードするモーショングループ
 // (尺が長いモーションは事前ロードするのでmodel.jsonのidleグループに入れて下さい)
-let PRELOAD_GROUP: string = "idle";
+const PRELOAD_GROUP: string = "idle";
 
 // Live2Dモデルの配列
 let LIVE2D_MODEL: any = [];

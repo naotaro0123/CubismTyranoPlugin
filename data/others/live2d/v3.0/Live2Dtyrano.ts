@@ -16,7 +16,7 @@ let Live2Dglno : number = 0;
 let Live2Dcanvas : any = [];
 
 
-class Live2Dtyrano{
+class Live2Dtyrano {
     private _app : PIXI.Application;
     private _modelInfo : any;
     private _moc : any;
@@ -34,6 +34,7 @@ class Live2Dtyrano{
         this._modelId = modelId;
         this.init();
     }
+
     init(){
         this.loadMoc();
         this.loadTextures();
@@ -48,16 +49,19 @@ class Live2Dtyrano{
             this.tick();
         });
     }
+
     loadMoc(){
         PIXI.loader.add("Moc", LIVE2D_MODEL[this._modelId].filepath + this._modelInfo.Moc,
             { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.BUFFER });
     }
+
     loadTextures(){
         for(var i = 0; i < this._modelInfo.Textures.length; i++)
         {
             PIXI.loader.add(`Texture${i}`, LIVE2D_MODEL[this._modelId].filepath + this._modelInfo.Textures[i]);
         }
     }
+
     loadMotions(){
         if(this._modelInfo.Motions !== void 0){
             for(var i = 0; i < this._modelInfo.Motions.length; i++)
@@ -67,12 +71,14 @@ class Live2Dtyrano{
             }
         }
     }
+
     loadPhysics(){
         if(this._modelInfo.Physics !== void 0){
             PIXI.loader.add("Physics", LIVE2D_MODEL[this._modelId].filepath + this._modelInfo.Physics,
             { xhrType: PIXI.loaders.Resource.XHR_RESPONSE_TYPE.JSON });
         }
     }
+
     loadResources(_resources : PIXI.loaders.ResourceDictionary){
         // Load moc.
         this._moc = LIVE2DCUBISMCORE.Moc.fromArrayBuffer(_resources["Moc"].data);
@@ -96,6 +102,7 @@ class Live2Dtyrano{
         this._app.stage.addChild(this._model);
         this._app.stage.addChild(this._model.masks);
     }
+
     loadAnimations(_resources : PIXI.loaders.ResourceDictionary){
         // Load animation.
         this._animations = [];
@@ -107,16 +114,20 @@ class Live2Dtyrano{
             }
         }
     }
+
     playAnimation(i : number){
         // Play animation.
         this._model.animator.getLayer("Base").play(this._animations[i]);
     }
+
     stopAnimation(){
         this._model.animator.getLayer("Base").stop();
     }
+
     setLoop(loop : boolean){
         this._model.animator.getLayer("Base").currentAnimation.loop = loop;
     }
+
     tick(){
         // Set up ticker.
         this._app.ticker.add((deltaTime) => {
@@ -124,12 +135,15 @@ class Live2Dtyrano{
             this._model.masks.update(this._app.renderer);
         });
     }
+
     setTickSpeed(speed : number = 1){
         this._app.ticker.speed = speed;
     }
+
     showTickFPS(){
         console.log(this._app.ticker.FPS);
     }
+
     resize(){
         let width = CANVAS_INFO.width;
         let height = CANVAS_INFO.height;
@@ -145,17 +159,17 @@ class Live2Dtyrano{
         // Resize mask texture.
         this._model.masks.resize(this._app.view.width, this._app.view.height);
     }
+
     destroy(){
         this.stopAnimation();
         this._app.ticker.stop();
         this._loader.reset();
         this._app.destroy();
-
     }
 }
 
 
-function live2d_new(name : string){
+function live2d_new(name : any){
     // Create app.
     let app: PIXI.Application = new PIXI.Application(CANVAS_INFO.width, CANVAS_INFO.height,
                                 {transparent : CANVAS_INFO.transparent});
@@ -171,7 +185,7 @@ function live2d_new(name : string){
             Live2Dglno++;
 
             app.view.id = CANVAS_INFO.id + name;
-            app.view.style.zIndex = 12;
+            app.view.style.zIndex = "12";
             app.view.style.position = 'absolute';
 
             //レイヤー配下に追加するように実装

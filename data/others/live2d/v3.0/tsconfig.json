@@ -6,8 +6,7 @@
         "sourceMap": true,
         "noImplicitAny": true,
         "removeComments": true,
-        "preserveConstEnums": true,
-        "watch": true
+        "preserveConstEnums": true
     },
     "include": [
         "./framework/*.ts",
