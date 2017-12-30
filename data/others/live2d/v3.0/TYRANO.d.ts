@@ -6,7 +6,7 @@ declare namespace TYRANO {
         static checkMessage(jtext: any): void;
         static clearTmpVariable(): void;
         static clearVariable(): void;
-        config: {};
+        static config: config;
         define: {};
         static embScript(str: any, preexp: any): void;
         static endStorage(): void;
@@ -37,13 +37,46 @@ declare namespace TYRANO {
         static setStyles(j_obj: any, array_style: any): void;
         static setTitle(title: any): void;
         sound_swf: any;
-        stat: {};
+        static stat: stat;
         static test(): void;
         tmp: {};
         tyrano: any;
         variable: {};
         static warning(str: any): void;
         static layer: layer;
+    }
+
+    class stat {
+        set_text_span : boolean;
+        f: f;
+        mp: any;
+        current_scenario: any;
+        current_line: any;
+        current_layer: any;
+        current_page: any;
+        visible_menu_button: any;
+        default_font: any;
+        vertical: any;
+        font: any;
+        is_strong_stop: boolean;
+        map_label: any;
+        is_stop: boolean;
+        current_cursor: any;
+        title: any;
+    }
+    class f {
+        live2d_models: any;
+    }
+
+    class config {
+        configSave: any;
+        defaultStorageExtension: any;
+        mediaFormatDefault: any;
+        preload: any;
+        projectID: any;
+        skipSpeed: any;
+        scWidth: any;
+        scHeight: any;
     }
 
     class layer {

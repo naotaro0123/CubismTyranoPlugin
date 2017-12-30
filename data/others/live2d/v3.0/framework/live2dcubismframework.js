@@ -14,29 +14,29 @@ var LIVE2DCUBISMFRAMEWORK;
         BuiltinAnimationSegmentEvaluators.lerp = function (a, b, t) {
             return new AnimationPoint((a.time + ((b.time - a.time) * t)), (a.value + ((b.value - a.value) * t)));
         };
+        BuiltinAnimationSegmentEvaluators.LINEAR = function (points, offset, time) {
+            var p0 = points[offset + 0];
+            var p1 = points[offset + 1];
+            var t = (time - p0.time) / (p1.time - p0.time);
+            return (p0.value + ((p1.value - p0.value) * t));
+        };
+        BuiltinAnimationSegmentEvaluators.BEZIER = function (points, offset, time) {
+            var t = (time - points[offset + 0].time) / (points[offset + 3].time - points[offset].time);
+            var p01 = BuiltinAnimationSegmentEvaluators.lerp(points[offset + 0], points[offset + 1], t);
+            var p12 = BuiltinAnimationSegmentEvaluators.lerp(points[offset + 1], points[offset + 2], t);
+            var p23 = BuiltinAnimationSegmentEvaluators.lerp(points[offset + 2], points[offset + 3], t);
+            var p012 = BuiltinAnimationSegmentEvaluators.lerp(p01, p12, t);
+            var p123 = BuiltinAnimationSegmentEvaluators.lerp(p12, p23, t);
+            return BuiltinAnimationSegmentEvaluators.lerp(p012, p123, t).value;
+        };
+        BuiltinAnimationSegmentEvaluators.STEPPED = function (points, offset, time) {
+            return points[offset + 0].value;
+        };
+        BuiltinAnimationSegmentEvaluators.INVERSE_STEPPED = function (points, offset, time) {
+            return points[offset + 1].value;
+        };
         return BuiltinAnimationSegmentEvaluators;
     }());
-    BuiltinAnimationSegmentEvaluators.LINEAR = function (points, offset, time) {
-        var p0 = points[offset + 0];
-        var p1 = points[offset + 1];
-        var t = (time - p0.time) / (p1.time - p0.time);
-        return (p0.value + ((p1.value - p0.value) * t));
-    };
-    BuiltinAnimationSegmentEvaluators.BEZIER = function (points, offset, time) {
-        var t = (time - points[offset + 0].time) / (points[offset + 3].time - points[offset].time);
-        var p01 = BuiltinAnimationSegmentEvaluators.lerp(points[offset + 0], points[offset + 1], t);
-        var p12 = BuiltinAnimationSegmentEvaluators.lerp(points[offset + 1], points[offset + 2], t);
-        var p23 = BuiltinAnimationSegmentEvaluators.lerp(points[offset + 2], points[offset + 3], t);
-        var p012 = BuiltinAnimationSegmentEvaluators.lerp(p01, p12, t);
-        var p123 = BuiltinAnimationSegmentEvaluators.lerp(p12, p23, t);
-        return BuiltinAnimationSegmentEvaluators.lerp(p012, p123, t).value;
-    };
-    BuiltinAnimationSegmentEvaluators.STEPPED = function (points, offset, time) {
-        return points[offset + 0].value;
-    };
-    BuiltinAnimationSegmentEvaluators.INVERSE_STEPPED = function (points, offset, time) {
-        return points[offset + 1].value;
-    };
     LIVE2DCUBISMFRAMEWORK.BuiltinAnimationSegmentEvaluators = BuiltinAnimationSegmentEvaluators;
     var AnimationSegment = (function () {
         function AnimationSegment(offset, evaluate) {
@@ -176,17 +176,17 @@ var LIVE2DCUBISMFRAMEWORK;
     var BuiltinAnimationBlenders = (function () {
         function BuiltinAnimationBlenders() {
         }
+        BuiltinAnimationBlenders.OVERRIDE = function (source, destination, weight) {
+            return (destination * weight);
+        };
+        BuiltinAnimationBlenders.ADD = function (source, destination, weight) {
+            return (source + (destination * weight));
+        };
+        BuiltinAnimationBlenders.MULTIPLY = function (source, destination, weight) {
+            return (source * (1 + ((destination - 1) * weight)));
+        };
         return BuiltinAnimationBlenders;
     }());
-    BuiltinAnimationBlenders.OVERRIDE = function (source, destination, weight) {
-        return (destination * weight);
-    };
-    BuiltinAnimationBlenders.ADD = function (source, destination, weight) {
-        return (source + (destination * weight));
-    };
-    BuiltinAnimationBlenders.MULTIPLY = function (source, destination, weight) {
-        return (source * (1 + ((destination - 1) * weight)));
-    };
     LIVE2DCUBISMFRAMEWORK.BuiltinAnimationBlenders = BuiltinAnimationBlenders;
     var AnimationLayer = (function () {
         function AnimationLayer() {
@@ -406,9 +406,9 @@ var LIVE2DCUBISMFRAMEWORK;
             var y = this.y / length;
             return new PhysicsVector2(x, y);
         };
+        PhysicsVector2.zero = new PhysicsVector2(0, 0);
         return PhysicsVector2;
     }());
-    PhysicsVector2.zero = new PhysicsVector2(0, 0);
     LIVE2DCUBISMFRAMEWORK.PhysicsVector2 = PhysicsVector2;
     var Physics = (function () {
         function Physics() {
@@ -449,14 +449,14 @@ var LIVE2DCUBISMFRAMEWORK;
                 ? Math.acos(cosTheta)
                 : 0;
         };
+        Physics.gravity = new PhysicsVector2(0, -1);
+        Physics.wind = new PhysicsVector2(0, 0);
+        Physics.maximumWeight = 100;
+        Physics.airResistance = 5;
+        Physics.movementThreshold = 0.001;
+        Physics.correctAngles = false;
         return Physics;
     }());
-    Physics.gravity = new PhysicsVector2(0, -1);
-    Physics.wind = new PhysicsVector2(0, 0);
-    Physics.maximumWeight = 100;
-    Physics.airResistance = 5;
-    Physics.movementThreshold = 0.001;
-    Physics.correctAngles = false;
     LIVE2DCUBISMFRAMEWORK.Physics = Physics;
     var PhysicsParticle = (function () {
         function PhysicsParticle(initialPosition, mobility, delay, acceleration, radius) {
@@ -522,44 +522,63 @@ var LIVE2DCUBISMFRAMEWORK;
         });
         PhysicsInput.prototype.evaluateFactor = function (parameterValue, parameterMinimum, parameterMaximum, parameterDefault, normalization) {
             console.assert(parameterMaximum > parameterMinimum);
-            var value = parameterValue - parameterDefault;
-            var weight = (this.weight / Physics.maximumWeight) * ((this.invert)
-                ? 1
-                : -1);
-            if (value > 0) {
-                var parameterRange = parameterMaximum - parameterDefault;
-                if (parameterRange == 0) {
-                    value = normalization.angle.def;
-                }
-                else {
-                    var normalizationRange = normalization.angle.maximum - normalization.angle.def;
-                    if (normalizationRange == 0) {
-                        value = normalization.angle.maximum;
+            var parameterMiddle = this.getMiddleValue(parameterMinimum, parameterMaximum);
+            var value = parameterValue - parameterMiddle;
+            switch (Math.sign(value)) {
+                case 1:
+                    {
+                        var parameterRange = parameterMaximum - parameterMiddle;
+                        if (parameterRange == 0) {
+                            value = normalization.angle.def;
+                        }
+                        else {
+                            var normalizationRange = normalization.angle.maximum - normalization.angle.def;
+                            if (normalizationRange == 0) {
+                                value = normalization.angle.maximum;
+                            }
+                            else {
+                                value *= Math.abs(normalizationRange / parameterRange);
+                                value += normalization.angle.def;
+                            }
+                        }
                     }
-                    else {
-                        value *= Math.abs(normalizationRange / parameterRange);
+                    break;
+                case -1:
+                    {
+                        var parameterRange = parameterMiddle - parameterMinimum;
+                        if (parameterRange == 0) {
+                            value = normalization.angle.def;
+                        }
+                        else {
+                            var normalizationRange = normalization.angle.def - normalization.angle.minimum;
+                            if (normalizationRange == 0) {
+                                value = normalization.angle.minimum;
+                            }
+                            else {
+                                value *= Math.abs(normalizationRange / parameterRange);
+                                value += normalization.angle.def;
+                            }
+                        }
                     }
-                }
+                    break;
+                case 0:
+                    {
+                        value = normalization.angle.def;
+                    }
+                    break;
             }
-            else if (value < 0) {
-                var parameterRange = parameterDefault - parameterMinimum;
-                if (parameterRange == 0) {
-                    value = normalization.angle.def;
-                }
-                else {
-                    var normalizationRange = normalization.angle.def - normalization.angle.minimum;
-                    if (normalizationRange == 0) {
-                        value = normalization.angle.minimum;
-                    }
-                    else {
-                        value *= Math.abs(normalizationRange / parameterRange);
-                    }
-                }
-            }
-            else {
-                value = normalization.angle.def;
-            }
+            var weight = (this.weight / Physics.maximumWeight);
+            value *= (this.invert) ? 1 : -1;
             return new PhysicsFactorTuple(value * this.factor.x * weight, value * this.factor.y * weight, value * this.factor.angle * weight);
+        };
+        PhysicsInput.prototype.getRangeValue = function (min, max) {
+            var maxValue = Math.max(min, max);
+            var minValue = Math.min(min, max);
+            return Math.abs(maxValue - minValue);
+        };
+        PhysicsInput.prototype.getMiddleValue = function (min, max) {
+            var minValue = Math.min(min, max);
+            return minValue + (this.getRangeValue(min, max) / 2);
         };
         return PhysicsInput;
     }());
@@ -590,12 +609,11 @@ var LIVE2DCUBISMFRAMEWORK;
                 }
                 translation.y *= -1;
                 var angleResult = (Physics.directionToRadians(parentGravity.multiplyByScalar(-1), translation.multiplyByScalar(-1)));
-                value += (((((-translation.x) - (-parentGravity.x)) > 0)
+                value += (((((-translation.multiplyByScalar(-1).x) - (-parentGravity.multiplyByScalar(-1).x)) > 0)
                     ? -angleResult
                     : angleResult) * this.factor.angle);
                 translation.y *= -1;
             }
-            var weight = Physics.clampScalar(this.weight / Physics.maximumWeight, 0, 1);
             value *= ((this.invert)
                 ? -1
                 : 1);

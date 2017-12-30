@@ -8,6 +8,7 @@
 [loadjs storage = "live2d/v3.0/framework/live2dcubismpixi.js"]
 [loadjs storage = "live2d/v3.0/Live2Dmodel.js"]
 [loadjs storage = "live2d/v3.0/Live2Dtyrano.js"]
+[loadjs storage = "live2d/v3.0/Live2Dinit.js"]
 
 [iscript]
 ;live2Dが初めての場合、初期化する
